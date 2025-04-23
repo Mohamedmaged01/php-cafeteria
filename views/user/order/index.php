@@ -1,0 +1,354 @@
+<?php
+include_once '../../../config/db.php';
+
+session_start();
+$_SESSION['user_id'] = 1;
+$_SESSION['user_name'] = "Aya";
+$_SESSION['user_image'] = "default-user.jpg"; 
+
+
+$per_page = 8;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$start = ($page > 1) ? ($page * $per_page) - $per_page : 0;
+
+
+$total = mysqli_query($myconnection, "SELECT COUNT(*) as total FROM products WHERE available = 1");
+$total = mysqli_fetch_assoc($total)['total'];
+$pages = ceil($total / $per_page);
+
+
+$products = mysqli_query($myconnection, 
+    "SELECT * FROM products WHERE available = 1 LIMIT $start, $per_page");
+
+
+$rooms = mysqli_query($myconnection, "SELECT DISTINCT room FROM users WHERE room IS NOT NULL");
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafeteria Order System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .navbar-custom {
+    background-color: #6F4E37;
+    padding: 15px 0; 
+    height: 80px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+}
+
+.navbar-brand {
+    font-size: 1.8rem; 
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand i {
+    font-size: 2rem;
+    margin-right: 10px;
+}
+
+.nav-link {
+    font-size: 1.1rem; 
+    padding: 10px 15px !important;
+    margin: 0 5px;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.user-avatar {
+    width: 50px; 
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #C4A484; 
+    transition: all 0.3s;
+}
+
+.user-avatar:hover {
+    transform: scale(1.05); 
+}
+
+.user-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-right: 15px;
+    color: white;
+}
+
+.navbar-toggler {
+    padding: 0.5rem 0.75rem;
+    font-size: 1.25rem;
+}
+
+
+    
+    .nav-link {
+        margin: 5px 0;
+        padding: 8px 12px !important;
+    }
+    
+    .user-info {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+        .btn-coffee {
+            background-color: #6F4E37;
+            color: white;
+        }
+        .btn-coffee:hover {
+            background-color: #5a3c2a;
+            color: white;
+        }
+        .page-item.active .page-link {
+            background-color: #6F4E37;
+            border-color: #6F4E37;
+        }
+        .page-link {
+            color: #6F4E37;
+        }
+        .product-card {
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .order-section {
+            background: #f8f9fa;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            border-left: 1px solid #dee2e6;
+        }
+        .order-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .order-item-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .btn-coffee {
+            background-color: #6F4E37;
+            color: white;
+        }
+        .btn-coffee:hover {
+            background-color: #5a3c2a;
+            color: white;
+        }
+        .page-item.active .page-link {
+            background-color: #6F4E37;
+            border-color: #6F4E37;
+        }
+        .page-link {
+            color: #6F4E37;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-coffee me-2"></i> Café Delight
+            </a>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/php-cafeteria/views/user/order/list.php">
+                            <i class="fas fa-list-alt me-1"></i> My Orders
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    <span class="text-white me-2"><?= $_SESSION['user_name'] ?></span>
+                    <img src="/php-cafeteria/public/uploads/<?= $_SESSION['user_image'] ?>" 
+                         class="user-avatar" 
+                         alt="User Avatar">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+          
+            <div class="col-lg-8 p-4">
+                <h2 class="mb-4 text-coffee"><i class="fas fa-coffee me-2"></i>Our Menu</h2>
+                <div class="row">
+                    <?php while($product = mysqli_fetch_assoc($products)): ?>
+                        <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                            <div class="card product-card h-100" 
+                                 onclick="addToOrder(<?= $product['id'] ?>, '<?= $product['name'] ?>', <?= $product['price'] ?>, '<?= $product['image'] ?>')">
+                                <img src="/php-cafeteria/public/uploads/<?= $product['image'] ?>" 
+                                     class="card-img-top" 
+                                     style="height: 180px; object-fit: cover;" 
+                                     alt="<?= $product['name'] ?>">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?= $product['name'] ?></h5>
+                                    <p class="card-text text-success"><?= $product['price'] ?> LE</p>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+
+                <!-- Pagination -->
+                <?php if($pages > 1): ?>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <?php if($page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $page-1 ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <?php for($i = 1; $i <= $pages; $i++): ?>
+                                <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                </li>
+                            <?php endfor; ?>
+                            
+                            <?php if($page < $pages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $page+1 ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                <?php endif; ?>
+            </div>
+            
+            
+            <div class="col-lg-4 p-4 order-section">
+                <h3 class="mb-4"><i class="fas fa-receipt me-2"></i>Your Order</h3>
+                <form method="post" action="create.php" id="order-form">
+                    <div class="mb-3" id="order-list" style="max-height: 300px; overflow-y: auto;">
+                        <p class="text-muted text-center py-3">No items selected</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label"><i class="fas fa-edit me-2"></i>Special Instructions</label>
+                        <textarea name="notes" id="notes" class="form-control" rows="3" placeholder="e.g. Extra sugar, less ice..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="room" class="form-label"><i class="fas fa-door-open me-2"></i>Room Number</label>
+                        <select name="room" id="room" class="form-select">
+                            <?php while($room = mysqli_fetch_assoc($rooms)): ?>
+                                <option value="<?= $room['room'] ?>"><?= $room['room'] ?></option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5>Total:</h5>
+                        <h4><span id="total-price">0.00</span> LE</h4>
+                    </div>
+                    
+                    <input type="hidden" name="quantities" id="quantities-input">
+                    <button type="submit" class="btn btn-coffee btn-lg w-100 py-3">
+                        <i class="fas fa-paper-plane me-2"></i> Confirm Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let order = {};
+        
+        function addToOrder(id, name, price, image) {
+            if (!order[id]) {
+                order[id] = { name, price, quantity: 1, image };
+            } else {
+                order[id].quantity += 1;
+            }
+            updateOrderList();
+        }
+        
+        function updateOrderList() {
+            const list = document.getElementById('order-list');
+            const totalEl = document.getElementById('total-price');
+            const quantitiesInput = document.getElementById('quantities-input');
+            
+            list.innerHTML = '';
+            let total = 0;
+            let quantities = {};
+            
+            if (Object.keys(order).length === 0) {
+                list.innerHTML = '<p class="text-muted text-center py-3">No items selected</p>';
+                totalEl.textContent = '0.00';
+                quantitiesInput.value = JSON.stringify({});
+                return;
+            }
+            
+            for (let id in order) {
+                const item = order[id];
+                total += item.price * item.quantity;
+                quantities[id] = item.quantity;
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = 'order-item';
+                itemElement.innerHTML = `
+                    <img src="/php-cafeteria/public/uploads/${item.image}" class="order-item-img" alt="${item.name}">
+                    <div style="flex: 1;">
+                        <strong>${item.name}</strong>
+                        <div class="text-muted small">${item.price} LE × ${item.quantity}</div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                onclick="event.stopPropagation(); updateQuantity(${id}, -1)">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                onclick="event.stopPropagation(); updateQuantity(${id}, 1)">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(itemElement);
+            }
+            
+            totalEl.textContent = total.toFixed(2);
+            quantitiesInput.value = JSON.stringify(quantities);
+        }
+        
+        function updateQuantity(id, delta) {
+            if (order[id]) {
+                order[id].quantity += delta;
+                if (order[id].quantity <= 0) {
+                    delete order[id];
+                }
+                updateOrderList();
+            }
+        }
+    </script>
+</body>
+</html>
