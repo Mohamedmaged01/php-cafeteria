@@ -21,7 +21,8 @@ $products = mysqli_query($myconnection,
     "SELECT * FROM products WHERE available = 1 LIMIT $start, $per_page");
 
 
-$rooms = mysqli_query($myconnection, "SELECT DISTINCT room FROM users WHERE room IS NOT NULL");
+    $rooms = mysqli_query($myconnection, "SELECT * FROM rooms WHERE status = 'available'");
+
 ?>
 
 <!DOCTYPE html>
@@ -162,6 +163,42 @@ $rooms = mysqli_query($myconnection, "SELECT DISTINCT room FROM users WHERE room
         .page-link {
             color: #6F4E37;
         }
+        .search-box {
+    transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+    box-shadow: 0 0 0 0.25rem rgba(111, 78, 55, 0.25);
+}
+
+#search-input {
+    border-color: #6F4E37;
+}
+
+#search-input:focus {
+    border-color: #6F4E37;
+    box-shadow: 0 0 0 0.25rem rgba(111, 78, 55, 0.25);
+}
+
+/* إضافة أنيميشن */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+.animate__headShake {
+    animation-name: shake;
+    animation-duration: 1s;
+    animation-fill-mode: both;
+}
+
+/* رسالة التحذير */
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffeeba;
+}
     </style>
 </head>
 <body>
@@ -194,25 +231,49 @@ $rooms = mysqli_query($myconnection, "SELECT DISTINCT room FROM users WHERE room
     <div class="container-fluid">
         <div class="row">
           
-            <div class="col-lg-8 p-4">
-                <h2 class="mb-4 text-coffee"><i class="fas fa-coffee me-2"></i>Our Menu</h2>
-                <div class="row">
-                    <?php while($product = mysqli_fetch_assoc($products)): ?>
-                        <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-                            <div class="card product-card h-100" 
-                                 onclick="addToOrder(<?= $product['id'] ?>, '<?= $product['name'] ?>', <?= $product['price'] ?>, '<?= $product['image'] ?>')">
-                                <img src="/php-cafeteria/public/uploads/<?= $product['image'] ?>" 
-                                     class="card-img-top" 
-                                     style="height: 180px; object-fit: cover;" 
-                                     alt="<?= $product['name'] ?>">
-                                <div class="card-body">
-                                    <h5 class="card-title"><?= $product['name'] ?></h5>
-                                    <p class="card-text text-success"><?= $product['price'] ?> LE</p>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
+        <div class="col-lg-8 p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h2 class="mb-3 mb-md-0 text-coffee"><i class="fas fa-coffee me-2"></i>Our Menu</h2>
+        <div class="search-box" style="width: 100%; max-width: 300px;">
+            <div class="input-group">
+                <input type="text" id="search-input" class="form-control" placeholder="Search products..." 
+                       aria-label="Search products">
+                <button class="btn btn-coffee" type="button" id="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row" id="products-container">
+        <?php 
+        mysqli_data_seek($products, 0);
+        $hasProducts = false;
+        while($product = mysqli_fetch_assoc($products)): 
+            $hasProducts = true;
+        ?>
+            <div class="col-xl-3 col-lg-4 col-md-6 mb-4 product-item">
+                <div class="card product-card h-100" 
+                     onclick="addToOrder(<?= $product['id'] ?>, '<?= htmlspecialchars($product['name'], ENT_QUOTES) ?>', <?= $product['price'] ?>, '<?= $product['image'] ?>')">
+                    <img src="/php-cafeteria/public/uploads/<?= $product['image'] ?>" 
+                         class="card-img-top" 
+                         style="height: 180px; object-fit: cover;" 
+                         alt="<?= htmlspecialchars($product['name'], ENT_QUOTES) ?>">
+                    <div class="card-body">
+                        <h5 class="card-title"><?= htmlspecialchars($product['name'], ENT_QUOTES) ?></h5>
+                        <p class="card-text text-success"><?= number_format($product['price'], 2) ?> LE</p>
+                    </div>
                 </div>
+            </div>
+        <?php endwhile; ?>
+        
+        <?php if(!$hasProducts): ?>
+            <div class="col-12 text-center py-5 no-products-message">
+                <i class="fas fa-coffee fa-3x mb-3 text-muted"></i>
+                <h4 class="text-muted">No products available</h4>
+            </div>
+        <?php endif; ?>
+    </div>
 
                 <!-- Pagination -->
                 <?php if($pages > 1): ?>
@@ -258,13 +319,14 @@ $rooms = mysqli_query($myconnection, "SELECT DISTINCT room FROM users WHERE room
                     </div>
                     
                     <div class="mb-3">
-                        <label for="room" class="form-label"><i class="fas fa-door-open me-2"></i>Room Number</label>
-                        <select name="room" id="room" class="form-select">
-                            <?php while($room = mysqli_fetch_assoc($rooms)): ?>
-                                <option value="<?= $room['room'] ?>"><?= $room['room'] ?></option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
+    <label for="room" class="form-label"><i class="fas fa-door-open me-2"></i>Room Number</label>
+    <select name="room_id" id="room" class="form-select">
+        <?php while($room = mysqli_fetch_assoc($rooms)): ?>
+            <option value="<?= $room['id'] ?>"><?= $room['number'] ?></option>
+        <?php endwhile; ?>
+    </select>
+</div>
+
                     
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5>Total:</h5>
@@ -272,9 +334,9 @@ $rooms = mysqli_query($myconnection, "SELECT DISTINCT room FROM users WHERE room
                     </div>
                     
                     <input type="hidden" name="quantities" id="quantities-input">
-                    <button type="submit" class="btn btn-coffee btn-lg w-100 py-3">
-                        <i class="fas fa-paper-plane me-2"></i> Confirm Order
-                    </button>
+                    <button type="submit" class="btn btn-coffee btn-lg w-100 py-3" id="confirm-btn" disabled>
+    <i class="fas fa-paper-plane me-2"></i> Confirm Order
+</button>
                 </form>
             </div>
         </div>
@@ -295,20 +357,28 @@ $rooms = mysqli_query($myconnection, "SELECT DISTINCT room FROM users WHERE room
         
         function updateOrderList() {
             const list = document.getElementById('order-list');
-            const totalEl = document.getElementById('total-price');
-            const quantitiesInput = document.getElementById('quantities-input');
-            
-            list.innerHTML = '';
-            let total = 0;
-            let quantities = {};
-            
-            if (Object.keys(order).length === 0) {
-                list.innerHTML = '<p class="text-muted text-center py-3">No items selected</p>';
-                totalEl.textContent = '0.00';
-                quantitiesInput.value = JSON.stringify({});
-                return;
-            }
-            
+    const totalEl = document.getElementById('total-price');
+    const quantitiesInput = document.getElementById('quantities-input');
+    const confirmBtn = document.getElementById('confirm-btn');
+    
+    list.innerHTML = '';
+    let total = 0;
+    let quantities = {};
+    
+    if (Object.keys(order).length === 0) {
+        list.innerHTML = '<p class="text-muted text-center py-3">No items selected</p>';
+        totalEl.textContent = '0.00';
+        quantitiesInput.value = JSON.stringify({});
+        confirmBtn.disabled = true;
+        confirmBtn.classList.remove('btn-coffee');
+        confirmBtn.classList.add('btn-secondary');
+        return;
+    }
+    
+    
+    confirmBtn.disabled = false;
+    confirmBtn.classList.add('btn-coffee');
+    confirmBtn.classList.remove('btn-secondary');
             for (let id in order) {
                 const item = order[id];
                 total += item.price * item.quantity;
@@ -349,6 +419,76 @@ $rooms = mysqli_query($myconnection, "SELECT DISTINCT room FROM users WHERE room
                 updateOrderList();
             }
         }
+        document.getElementById('search-input').addEventListener('input', performSearch);
+
+function performSearch() {
+    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const productItems = document.querySelectorAll('.product-item');
+    let hasResults = false;
+    
+    productItems.forEach(item => {
+        const productName = item.querySelector('.card-title').textContent.toLowerCase();
+        if (productName.includes(searchTerm)) {
+            item.style.display = 'block';
+            hasResults = true;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+   
+    const noResultsMessage = document.querySelector('.no-results-message');
+    if (!hasResults && searchTerm.length > 0) {
+        if (!noResultsMessage) {
+            const productsContainer = document.getElementById('products-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'col-12 text-center py-5 no-results-message';
+            messageDiv.innerHTML = `
+                <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                <h4 class="text-muted">No results found for "${searchTerm}"</h4>
+                <p class="text-muted">Try different keywords</p>
+            `;
+            productsContainer.appendChild(messageDiv);
+        }
+    } else if (noResultsMessage) {
+        noResultsMessage.remove();
+    }
+}
+
+
+document.querySelectorAll('.page-link').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('search-input').value = '';
+        
+        document.querySelectorAll('.product-item').forEach(item => {
+            item.style.display = 'block';
+        });
+        
+        const noResultsMessage = document.querySelector('.no-results-message');
+        if (noResultsMessage) noResultsMessage.remove();
+    });
+});
+
+document.getElementById('order-form').addEventListener('submit', function(e) {
+    if (Object.keys(order).length === 0) {
+        e.preventDefault();
+        alert('Please add at least one item to your order before confirming');
+        
+        const orderList = document.getElementById('order-list');
+        orderList.innerHTML = `
+            <div class="alert alert-warning text-center py-3">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Please add at least one item to your order
+            </div>
+        `;
+        
+        document.querySelector('.order-section').classList.add('animate__animated', 'animate__headShake');
+        setTimeout(() => {
+            document.querySelector('.order-section').classList.remove('animate__animated', 'animate__headShake');
+        }, 1000);
+    }
+});
+
     </script>
 </body>
 </html>

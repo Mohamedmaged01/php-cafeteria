@@ -139,6 +139,7 @@ $items = mysqli_query($myconnection, "
                 <?php endif; ?>
                 
                 <div class="divider"></div>
+
                 
                 <!-- Order Items -->
                 <h4 class="mb-3"><i class="fas fa-list-ul info-icon"></i>Order Items</h4>
@@ -190,6 +191,8 @@ $items = mysqli_query($myconnection, "
             </div>
         </div>
     </div>
+
+    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
