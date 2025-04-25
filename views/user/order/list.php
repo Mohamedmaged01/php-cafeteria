@@ -14,8 +14,6 @@ $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 if (!$conn) {
   die("Connection failed: " . mysqli_connect_error());
 }
-
-
 if (isset($_GET['cancel_id'])) {
   $cancel_id = mysqli_real_escape_string($conn, $_GET['cancel_id']);
   $query = "UPDATE orders SET status='cancelled' WHERE id='$cancel_id' AND user_id='$user_id' AND status='Processing'";
