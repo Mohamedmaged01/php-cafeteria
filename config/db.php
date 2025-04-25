@@ -1,12 +1,17 @@
-<?php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'PHP_Project');
+<?php 
 
-$conn = new mysqli($host, $user, $pass, $db);
+$servername = "localhost";
+$username = "root"; 
+$password = "";
+$dbname = "PHP_Project";
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$myconnection = mysqli_connect($servername, $username,  $password, $dbname);
+
+
+
+// if ($myconnection ){
+//     echo "connected";
+// }else{
+//     echo "not connected";
+// }
 ?>
