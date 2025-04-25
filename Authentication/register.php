@@ -6,23 +6,16 @@ include 'mail_functions.php';
 $errors = [];
 $success = '';
 
-
-
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-
-
     // Sanitize inputs
     $name = $myconnection->real_escape_string($_POST['name']);
     $email = $myconnection->real_escape_string($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
-    $room_no = $myconnection->real_escape_string($_POST['room_no']);
-    $ext = $myconnection->real_escape_string($_POST['ext']);
+    $room = $myconnection->real_escape_string($_POST['room_no']);
+    $ext = $myconnection->real_escape_string(substr($_POST['ext'], 0, 10)); 
 
-    // Handle profile picture upload
-    $profile_pic = null;
+    $picture = 'default-profile.png'; 
     if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == UPLOAD_ERR_OK) {
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
         $file_type = $_FILES['profile_pic']['type'];
@@ -44,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $target_path = $upload_dir . $filename;
                 
                 if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $target_path)) {
-                    $profile_pic = $target_path;
+                    $picture = $target_path;
                     chmod($target_path, 0644);
                 } else {
                     $errors[] = 'Failed to upload profile picture. Please try again.';
@@ -53,6 +46,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             $errors[] = 'Only JPG, PNG, and GIF files are allowed';
         }
+    }
+
+    if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
+        $errors[] = 'All required fields must be filled';
+    }
+
+    if ($password !== $confirm_password) {
+        $errors[] = 'Passwords do not match';
+    }
+
+    if (strlen($password) < 8) {
+        $errors[] = 'Password must be at least 8 characters long';
     }
 
     if (empty($errors)) {
@@ -77,37 +82,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
         $verification_token = bin2hex(random_bytes(32));
         
-        $stmt = $myconnection->prepare("INSERT INTO users (name, email, password, room_no, ext, profile_picture, verification_token) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        if ($stmt) {
-            $stmt->bind_param("sssssss", $name, $email, $hashed_password, $room_no, $ext, $profile_pic, $verification_token);
-            
-            if ($stmt->execute()) {
-                if (send_verification_email($email, $verification_token)) {
-                    $_SESSION['success_message'] = '
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle me-2"></i>
-                        Registration successful! Please check your email to verify your account.
-                    </div>';
-                } else {
-                    $_SESSION['error_message'] = '
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        Registration succeeded but failed to send verification email.
-                    </div>';
-                }
-            } else {
-                $_SESSION['error_message'] = '
-                <div class="alert alert-danger">
-                    <i class="fas fa-times-circle me-2"></i>
-                    Registration failed: ' . htmlspecialchars($stmt->error) . '
-                </div>';
-            }
-            $stmt->close();
+        // تخزين التوكن في الجلسة فقط
+        $_SESSION['verification_data'] = [
+            'email' => $email,
+            'token' => $verification_token,
+            'expires' => time() + 3600, // صلاحية ساعة واحدة
+            'user_data' => [
+                'name' => $name,
+                'password' => $hashed_password,
+                'room' => $room,
+                'ext' => $ext,
+                'picture' => $picture
+            ]
+        ];
+        
+        if (send_verification_email($email, $verification_token)) {
+            $_SESSION['success_message'] = '
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                Registration successful! Please check your email to verify your account.
+            </div>';
         } else {
+            unset($_SESSION['verification_data']);
             $_SESSION['error_message'] = '
-            <div class="alert alert-danger">
-                <i class="fas fa-times-circle me-2"></i>
-                Database error: ' . htmlspecialchars($myconnection->error) . '
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Failed to send verification email. Please try again.
             </div>';
         }
         
@@ -148,7 +148,7 @@ if (isset($_SESSION['success_message'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
     body {
-        background: #f5f0eb; /* لون خلفية فاتح يشبه لون الكريمة */
+        background: #f5f0eb;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         height: 100vh;
         display: flex;
@@ -195,7 +195,6 @@ if (isset($_SESSION['success_message'])) {
     
     .btn-primary {
         background-color: #6F4E37; 
-
         border: none;
         padding: 10px;
         font-weight: 600;
@@ -468,8 +467,8 @@ if (isset($_SESSION['success_message'])) {
             if (!password) {
                 showError('password', 'Password is required');
                 isValid = false;
-            } else if (password.length < 2) {
-                showError('password', 'Password must be at least 2 characters');
+            } else if (password.length < 8) {
+                showError('password', 'Password must be at least 8 characters');
                 isValid = false;
             } else {
                 clearError('password');

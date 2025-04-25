@@ -2,38 +2,30 @@
 session_start();
 include 'connect.php';
 
-
-
-
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $myconnection->real_escape_string($_POST['email']);
     $password = $_POST['password'];
 
-    $stmt = $myconnection->prepare("SELECT id, password, is_admin FROM users WHERE email = ?");
+    $stmt = $myconnection->prepare("SELECT id, password, role FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($user = $result->fetch_assoc()) {
         if (password_verify($password, $user['password'])) {
+            $token = bin2hex(random_bytes(32));
+            
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['is_admin'] = $user['is_admin'];
+            $_SESSION['user_role'] = $user['role'];
             
-            // Remember me functionality
-            if (isset($_POST['remember_me'])) {
-                $token = bin2hex(random_bytes(32));
-                setcookie('remember_token', $token, time() + (86400 * 30), "/"); // 30 days
-                
-                // Store token in database
-                $update_stmt = $myconnection->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
-                $update_stmt->bind_param("si", $token, $user['id']);
-                $update_stmt->execute();
-                $update_stmt->close();
-            }
+            $redirect_page = ($user['role'] == 'admin') ? 'dashboard.php' : 'home.php';
             
-            header("Location: home.php");
+            echo "<script>
+                sessionStorage.setItem('authToken', '".$token."');
+                window.location.href = '".$redirect_page."';
+            </script>";
             exit();
         } else {
             $error = 'Invalid email or password';
@@ -44,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->close();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>

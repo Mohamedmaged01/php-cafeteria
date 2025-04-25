@@ -2,18 +2,18 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+session_start();
 include_once 'connect.php';
 
 $error = '';
-$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email'];
+    $email = $myconnection->real_escape_string($_POST['email']);
     
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Please enter a valid email address';
     } else {
-        $stmt = $myconnection->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt = $myconnection->prepare("SELECT id, email FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -24,19 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $reset_token = bin2hex(random_bytes(32));
             $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
             
-            $stmt = $myconnection->prepare("UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?");
-            $stmt->bind_param("ssi", $reset_token, $expiry, $user['id']);
+            // تخزين البيانات في الجلسة
+            $_SESSION['reset_token'] = $reset_token;
+            $_SESSION['reset_token_expiry'] = $expiry;
+            $_SESSION['reset_user_id'] = $user['id'];
             
-            if ($stmt->execute()) {
-                // إعادة التوجيه مباشرة إلى صفحة إعادة التعيين بدون إرسال بريد
-                header("Location: reset_password.php?token=$reset_token");
-                exit();
-            } else {
-                $error = 'Failed to update reset token';
-            }
-            $stmt->close();
+            $reset_link = "reset_password.php?token=$reset_token";
+            
+            header("Location: $reset_link");
+            exit();
         } else {
-            $error = 'Email not found';
+            $error = 'Email not found in our system';
         }
     }
 }
@@ -139,6 +137,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             border-radius: 10px;
         }
         
+        .alert a {
+            color: inherit;
+            text-decoration: underline;
+        }
+        
         .wave-decoration {
             position: absolute;
             bottom: 0;
@@ -158,26 +161,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         .wave-decoration .shape-fill {
             fill: rgba(255, 255, 255, 0.15);
-        }
-        
-        /* Coffee-themed additional styles */
-        .btn-coffee {
-            background-color: #6F4E37;
-            color: white;
-        }
-        
-        .btn-coffee:hover {
-            background-color: #5a3c2a;
-            color: white;
-        }
-        
-        .page-item.active .page-link {
-            background-color: #6F4E37;
-            border-color: #6F4E37;
-        }
-        
-        .page-link {
-            color: #6F4E37;
         }
     </style>
 </head>

@@ -2,54 +2,63 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+session_start();
 include_once 'connect.php';
 
-$token = $_GET['token'] ?? '';
 $error = '';
 $success = '';
-$user = null;
+$valid_token = false;
 
-if (!empty($token)) {
-    $stmt = $myconnection->prepare("SELECT * FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()");
-    $stmt->bind_param("s", $token);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-    $stmt->close();
+// Verify token validity
+if (isset($_GET['token']) && isset($_SESSION['reset_token']) && 
+    $_GET['token'] === $_SESSION['reset_token'] &&
+    isset($_SESSION['reset_token_expiry']) &&
+    isset($_SESSION['reset_user_id']) &&
+    time() < strtotime($_SESSION['reset_token_expiry'])) {
+    
+    $valid_token = true;
+}
 
-    if (!$user) {
-        $error = 'Invalid or expired reset link';
-    }
+if (!$valid_token) {
+    $error = 'Invalid or expired reset link';
+    unset($_SESSION['reset_token']);
+    unset($_SESSION['reset_token_expiry']);
+    unset($_SESSION['reset_user_id']);
+}
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && $user) {
-        $password = $_POST['password'];
-        $confirm_password = $_POST['confirm_password'];
-
-        if ($password !== $confirm_password) {
-            $error = 'Passwords do not match';
-        } elseif (strlen($password) < 8) {
-            $error = 'Password must be at least 8 characters';
-        } elseif (!preg_match('/[A-Z]/', $password)) {
-            $error = 'Password must contain an uppercase letter';
-        } elseif (!preg_match('/[0-9]/', $password)) {
-            $error = 'Password must contain a number';
-        } else {
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $myconnection->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?");
-            $stmt->bind_param("si", $hashed_password, $user['id']);
+// Process form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && $valid_token) {
+    $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+    
+    if (empty($password) || empty($confirm_password)) {
+        $error = 'Please enter and confirm your new password';
+    } elseif ($password !== $confirm_password) {
+        $error = 'Passwords do not match';
+    } elseif (strlen($password) < 8) {
+        $error = 'Password must be at least 8 characters';
+    } elseif (!preg_match('/[A-Z]/', $password)) {
+        $error = 'Password must contain at least one uppercase letter';
+    } elseif (!preg_match('/[0-9]/', $password)) {
+        $error = 'Password must contain at least one number';
+    } else {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $myconnection->prepare("UPDATE users SET password = ? WHERE id = ?");
+        $stmt->bind_param("si", $hashed_password, $_SESSION['reset_user_id']);
+        
+        if ($stmt->execute()) {
+            $success = 'Password has been reset successfully!';
             
-            if ($stmt->execute()) {
-                $success = 'Password reset successfully!';
-                header("Location: login.php");
-               
-              } else {
-                $error = 'Failed to update password';
-            }
-            $stmt->close();
+            unset($_SESSION['reset_token']);
+            unset($_SESSION['reset_token_expiry']);
+            unset($_SESSION['reset_user_id']);
+            
+            header("Refresh: 400; url=login.php");
+        } else {
+            $error = 'Failed to update password. Please try again.';
         }
+        $stmt->close();
     }
-} else {
-    $error = 'Invalid reset link';
 }
 ?>
 
@@ -60,26 +69,20 @@ if (!empty($token)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Reset - Cafeteria System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-rtl@5.3.0/dist/css/bootstrap-rtl.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
     <style>
     :root {
         --coffee-dark: #6F4E37; 
         --coffee-medium: #8B4513; 
-
         --coffee-light: #d2b48c; 
-
         --cream-color: #f5f0eb; 
-
-      }
+    }
     
     body {
-        background: linear-gradient(135deg, #d2b48c 0%, #6F4E37 100%); 
-
+        background: linear-gradient(135deg, #d2b48c 0%, #6F4E37 100%);
         height: 100vh;
         font-family: 'Tajawal', sans-serif;
-        text-align: left;
     }
     
     .reset-container {
@@ -209,9 +212,7 @@ if (!empty($token)) {
                         <i class="fas fa-sign-in-alt me-2"></i>Back to Login
                     </a>
                 </div>
-            <?php endif; ?>
-
-            <?php if ($user && empty($success)): ?>
+            <?php elseif ($valid_token): ?>
                 <form method="POST">
                     <div class="mb-4">
                         <label for="password" class="form-label fw-semibold">New Password</label>
