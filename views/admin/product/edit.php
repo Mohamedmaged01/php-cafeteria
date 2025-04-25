@@ -4,15 +4,12 @@ $username = "root";
 $password = ""; 
 $dbname = "PHP_Project"; 
 
-// Create connection
 $conn = mysqli_connect($servername, $username, $password, $dbname);
 
-// Check connection
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Check if ID is provided
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     header("Location: list.php");
     exit;
@@ -20,14 +17,12 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $id = mysqli_real_escape_string($conn, $_GET['id']);
 
-// Initialize variables
 $name = '';
 $price = '';
 $current_image = '';
 $availability = '';
 $error = '';
 
-// Get product details
 $sql = "SELECT * FROM products WHERE id=$id";
 $result = mysqli_query($conn, $sql);
 
@@ -42,54 +37,43 @@ $price = $product['price'];
 $current_image = $product['image'];
 $availability = $product['availability'];
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_product'])) {
-    // Validate and sanitize input
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $price = mysqli_real_escape_string($conn, $_POST['price']);
     $availability = isset($_POST['availability']) ? 1 : 0;
     
-    // Basic validation
+    
     if (empty($name)) {
         $error = "Product name is required";
     } elseif (empty($price) || !is_numeric($price)) {
         $error = "Valid price is required";
     } else {
-        $image_sql = ""; // SQL fragment for image update
+        $image_sql = ""; 
         
-        // Handle image upload if a new image is selected
         if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
             $target_dir = "uploads/";
             $new_image = time() . '_' . basename($_FILES["image"]["name"]); // Add timestamp to avoid duplicate names
             $target_file = $target_dir . $new_image;
             $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
             
-            // Check if file is an actual image
             $check = getimagesize($_FILES["image"]["tmp_name"]);
             if($check === false) {
                 $error = "File is not an image";
             }
-            // Check file size (limit to 2MB)
             elseif ($_FILES["image"]["size"] > 2000000) {
                 $error = "Sorry, your file is too large (max 2MB)";
             }
-            // Allow only certain file formats
             elseif($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
                 $error = "Sorry, only JPG, JPEG, PNG & GIF files are allowed";
             }
-            // If everything is ok, try to upload file
             else {
-                // Create directory if it doesn't exist
                 if (!file_exists($target_dir)) {
                     mkdir($target_dir, 0777, true);
                 }
                 
                 if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-                    // Image uploaded successfully
                     $image_sql = ", image='$new_image'";
-                    
-                    // Delete old image if it exists
-                    if (!empty($current_image) && file_exists($target_dir . $current_image)) {
+                                        if (!empty($current_image) && file_exists($target_dir . $current_image)) {
                         unlink($target_dir . $current_image);
                     }
                 } else {
@@ -98,12 +82,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_product'])) {
             }
         }
         
-        // If no errors, update product
         if (empty($error)) {
             $sql = "UPDATE products SET name='$name', price='$price', availability='$availability' $image_sql WHERE id=$id";
             
             if (mysqli_query($conn, $sql)) {
-                // Redirect to products list with success message
                 header("Location: list.php?updated=success");
                 exit;
             } else {

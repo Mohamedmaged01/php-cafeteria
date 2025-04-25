@@ -22,12 +22,10 @@ $total_result = mysqli_query($conn, $total_sql);
 $total_row = mysqli_fetch_assoc($total_result);
 $total_pages = ceil($total_row['total'] / $records_per_page);
 
-// Handle delete action redirect
 if (isset($_GET['deleted']) && $_GET['deleted'] == 'success') {
     $message = "Product deleted successfully";
 }
 
-// Handle create/update redirects
 if (isset($_GET['created']) && $_GET['created'] == 'success') {
     $message = "Product added successfully";
 }

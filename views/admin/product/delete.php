@@ -4,15 +4,15 @@ $username = "root";
 $password = ""; 
 $dbname = "PHP_Project"; 
 
-// Create connection
+
 $conn = mysqli_connect($servername, $username, $password, $dbname);
 
-// Check connection
+
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Check if ID is provided
+
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     header("Location: list.php");
     exit;
@@ -20,36 +20,29 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $id = mysqli_real_escape_string($conn, $_GET['id']);
 
-// First, get the product to see if there's an image to delete
 $sql = "SELECT * FROM products WHERE id = $id";
 $result = mysqli_query($conn, $sql);
 
 if (mysqli_num_rows($result) > 0) {
     $product = mysqli_fetch_assoc($result);
     
-    // Delete the product image if it exists
     if (!empty($product['image']) && file_exists("uploads/" . $product['image'])) {
         unlink("uploads/" . $product['image']);
     }
     
-    // Now delete the product from database
     $delete_sql = "DELETE FROM products WHERE id = $id";
     
     if (mysqli_query($conn, $delete_sql)) {
-        // Redirect to products list with success message
         header("Location: list.php?deleted=success");
         exit;
     } else {
-        // If deletion fails, show error
         $error = "Error deleting product: " . mysqli_error($conn);
     }
 } else {
-    // Product not found
     header("Location: list.php");
     exit;
 }
 
-// Close connection
 mysqli_close($conn);
 ?>
 
