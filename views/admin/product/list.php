@@ -144,7 +144,7 @@ if (isset($_GET['updated']) && $_GET['updated'] == 'success') {
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-coffee"></i> Coffee  
+                Coffee  
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -174,7 +174,7 @@ if (isset($_GET['updated']) && $_GET['updated'] == 'success') {
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>All Products</h1>
             <a href="create.php" class="btn btn-coffee">
-                <i class="fas fa-plus me-2"></i>Add Product
+               Add Product
             </a>
         </div>
 
@@ -219,10 +219,10 @@ if (isset($_GET['updated']) && $_GET['updated'] == 'success') {
                                 </td>
                                 <td>
                                     <a href="edit.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-primary me-2">
-                                        <i class="fas fa-edit"></i> Edit
+                                  Edit
                                     </a>
                                     <a href="delete.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this product?')">
-                                        <i class="fas fa-trash"></i> Delete
+                                      Delete
                                     </a>
                                 </td>
                             </tr>

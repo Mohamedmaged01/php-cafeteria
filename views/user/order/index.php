@@ -206,14 +206,14 @@ $products = mysqli_query($myconnection,
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-coffee me-2"></i> Café Delight
+                Café Delight
             </a>
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="/php-cafeteria/views/user/order/list.php">
-                            <i class="fas fa-list-alt me-1"></i> My Orders
+                          My Orders
                         </a>
                     </li>
                 </ul>
@@ -233,7 +233,7 @@ $products = mysqli_query($myconnection,
           
         <div class="col-lg-8 p-4">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <h2 class="mb-3 mb-md-0 text-coffee"><i class="fas fa-coffee me-2"></i>Our Menu</h2>
+        <h2 class="mb-3 mb-md-0 text-coffee">Our Menu</h2>
         <div class="search-box" style="width: 100%; max-width: 300px;">
             <div class="input-group">
                 <input type="text" id="search-input" class="form-control" placeholder="Search products..." 

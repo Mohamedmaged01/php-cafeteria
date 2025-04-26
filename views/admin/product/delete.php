@@ -166,7 +166,7 @@ mysqli_close($conn);
     <div class="container mt-4">
         <div class="error-container">
             <div class="alert alert-danger">
-                <h3><i class="fas fa-exclamation-triangle me-2"></i>Error</h3>
+                <h3>Error</h3>
                 <p><?php echo $error; ?></p>
                 <div class="mt-4">
                     <a href="list.php" class="btn btn-coffee">Return to Products List</a>
