@@ -129,9 +129,7 @@ $customer_data = mysqli_fetch_assoc($customer);
                     <i class="fas fa-calendar-alt"></i> 
                     <?= date('F j, Y \a\t h:i A', strtotime($order_data['created_at'])) ?>
                 </p>
-                <?php if($order_data['placed_by_admin']): ?>
-                    <p class="mb-0"><i class="fas fa-user-shield"></i> Order placed by admin</p>
-                <?php endif; ?>
+              
             </div>
             
             <!-- Order Details -->
