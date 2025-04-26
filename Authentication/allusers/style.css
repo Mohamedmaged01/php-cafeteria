@@ -1,0 +1,111 @@
+:root {
+  --primary-color: #6F4E37; /* Coffee brown */
+  --secondary-color: #5a3c2a; /* Darker coffee */
+  --accent-color: #C4A484; /* Light coffee */
+  --light-color: #f8f9fa;
+  --dark-color: #5a3c2a;
+}
+
+/* Base styles */
+body {
+  background-color: var(--light-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+
+/* Navbar */
+.navbar-dark.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+/* Buttons */
+.btn-coffee {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-coffee:hover {
+  background-color: var(--secondary-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(111, 78, 55, 0.3);
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+  background-color: white;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+/* Tables */
+.table th {
+  background-color: var(--secondary-color);
+  color: white;
+  font-weight: 500;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+/* Profile images */
+.profile-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent-color);
+  transition: all 0.3s ease;
+}
+
+.profile-img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(111, 78, 55, 0.3);
+}
+
+/* Badges */
+.badge.bg-dark {
+  background-color: var(--secondary-color) !important;
+}
+
+/* Alerts */
+.alert {
+  border-radius: 8px;
+}
+
+/* Pagination */
+.page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.page-link {
+  color: var(--primary-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-img {
+      width: 40px;
+      height: 40px;
+  }
+
+  .table-responsive {
+      font-size: 0.9rem;
+  }
+}
