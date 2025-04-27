@@ -12,10 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $myconnection->real_escape_string($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
-    $room = $myconnection->real_escape_string($_POST['room_no']);
+   
     $ext = $myconnection->real_escape_string(substr($_POST['ext'], 0, 10)); 
 
-    $picture = 'default-profile.png'; 
+    $picture = 'download.jpeg'; 
     if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == UPLOAD_ERR_OK) {
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
         $file_type = $_FILES['profile_pic']['type'];
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = 'Passwords do not match';
     }
 
-    if (strlen($password) < 8) {
+    if (strlen($password) < 5) {
         $errors[] = 'Password must be at least 8 characters long';
     }
 
@@ -82,15 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
         $verification_token = bin2hex(random_bytes(32));
         
-        // تخزين التوكن في الجلسة فقط
         $_SESSION['verification_data'] = [
             'email' => $email,
             'token' => $verification_token,
-            'expires' => time() + 3600, // صلاحية ساعة واحدة
+            'expires' => time() + 3600, 
             'user_data' => [
                 'name' => $name,
                 'password' => $hashed_password,
-                'room' => $room,
+               
                 'ext' => $ext,
                 'picture' => $picture
             ]
@@ -305,17 +304,7 @@ if (isset($_SESSION['success_message'])) {
                             <div class="invalid-feedback" id="email_error"></div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="room_no" class="form-label fw-semibold">Room Number</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-door-open"></i></span>
-                                <input type="text" class="form-control" id="room_no" name="room_no" placeholder="Enter room number">
-                            </div>
-                            <div class="invalid-feedback" id="room_no_error"></div>
-                        </div>
-                    </div>
-                </div>
+             
 
                 <div class="row">
                     <div class="col-md-6">

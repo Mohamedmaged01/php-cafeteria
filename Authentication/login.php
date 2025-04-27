@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'connect.php';
+include_once'connect.php';
 
 $error = '';
 
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_role'] = $user['role'];
             
-            $redirect_page = ($user['role'] == 'admin') ? 'dashboard.php' : 'home.php';
+            $redirect_page = ($user['role'] == 'admin') ? 'dashboard.php' : '../views/user/order/index.php';
             
             echo "<script>
                 sessionStorage.setItem('authToken', '".$token."');

@@ -24,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $reset_token = bin2hex(random_bytes(32));
             $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
             
-            // تخزين البيانات في الجلسة
             $_SESSION['reset_token'] = $reset_token;
             $_SESSION['reset_token_expiry'] = $expiry;
             $_SESSION['reset_user_id'] = $user['id'];
@@ -67,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .forgot-container {
             max-width: 500px;
             border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 30px hsla(42, 97.00%, 13.10%, 0.79);
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -78,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         .forgot-container:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 20px 40px rgba(90, 42, 3, 0.64);
         }
         
         .logo-img {
@@ -92,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .form-title {
             color: var(--primary-color);
             font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 2px 4px hsl(36, 93.20%, 17.30%);
         }
         
         .form-subtitle {

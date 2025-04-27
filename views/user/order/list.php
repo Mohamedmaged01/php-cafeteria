@@ -19,11 +19,11 @@ if (isset($_GET['cancel_id'])) {
   $query = "UPDATE orders SET status='cancelled' WHERE id='$cancel_id' AND user_id='$user_id' AND status='Processing'";
   $result = mysqli_query($conn, $query);
   if ($result) {
-    echo "success"
+    echo "success";
   } else {
      echo "Error cancelling order: " . mysqli_error($conn);
   }
-  header("Location: orders.php");
+  header("Location: list.php");
   exit;
 }
 

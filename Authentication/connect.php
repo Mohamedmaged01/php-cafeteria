@@ -1,14 +1,9 @@
 
 <?php
 $servername = "localhost";
-$username = "root";
+$username = "root"; 
 $password = "";
-$dbname = "DB_Project_Database";
+$dbname = "PHP_Project";
 
-// Create myconnection
-$myconnection = mysqli_connect($servername, $username, $password, $dbname);
-// Check myconnection
-if ($myconnection) {
-} else {
-    die("myconnection failed: " . mysqli_connect_error());
-}
+$myconnection = mysqli_connect($servername, $username,  $password, $dbname);
+

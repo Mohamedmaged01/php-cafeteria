@@ -7,13 +7,11 @@ if (isset($_GET['token']) && isset($_SESSION['verification_data'])) {
     $session_data = $_SESSION['verification_data'];
     
     if ($token === $session_data['token'] && time() < $session_data['expires']) {
-        // إدخال المستخدم في قاعدة البيانات بعد التحقق
-        $stmt = $myconnection->prepare("INSERT INTO users (name, email, password, room, ext, picture) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", 
+        $stmt = $myconnection->prepare("INSERT INTO users (name, email, password, ext, picture) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", 
             $session_data['user_data']['name'],
             $session_data['email'],
             $session_data['user_data']['password'],
-            $session_data['user_data']['room'],
             $session_data['user_data']['ext'],
             $session_data['user_data']['picture']
         );
