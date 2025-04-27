@@ -215,11 +215,11 @@ $products = mysqli_query($myconnection,
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-coffee me-2"></i> Café Delight
+                Café Delight
             </a>
             <div class="ml-auto">
                 <a href="./../user/auth/login.php" class="btn btn-login">
-                    <i class="fas fa-sign-in-alt me-2"></i> Login
+                    Login
                 </a>
             </div>
         </div>
@@ -232,10 +232,10 @@ $products = mysqli_query($myconnection,
             <p class="lead mb-5">Discover the finest coffee and delicious treats in town</p>
             <div class="d-flex justify-content-center gap-3">
                 <a href="#products" class="btn btn-coffee btn-lg px-4">
-                    <i class="fas fa-coffee me-2"></i> Explore Menu
+                    Explore Menu
                 </a>
                 <a href="./../user/auth/login.php" class="btn btn-coffee-outline btn-lg px-4">
-                    <i class="fas fa-user me-2"></i> Sign In
+                     Sign In
                 </a>
             </div>
         </div>
@@ -247,28 +247,28 @@ $products = mysqli_query($myconnection,
             <div class="row g-4">
                 <div class="col-md-3">
                     <div class="feature-card text-center p-4 h-100">
-                        <i class="fas fa-award fa-3x mb-3" style="color: var(--primary-color);"></i>
+                       
                         <h4>Supreme Quality</h4>
                         <p class="text-muted">Premium ingredients for perfect taste</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="feature-card text-center p-4 h-100">
-                        <i class="fas fa-clock fa-3x mb-3" style="color: var(--primary-color);"></i>
+                       
                         <h4>Fast Service</h4>
                         <p class="text-muted">Quick preparation and delivery</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="feature-card text-center p-4 h-100">
-                        <i class="fas fa-heart fa-3x mb-3" style="color: var(--primary-color);"></i>
+                       
                         <h4>Made with Love</h4>
                         <p class="text-muted">Every cup prepared with care</p>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="feature-card text-center p-4 h-100">
-                        <i class="fas fa-tag fa-3x mb-3" style="color: var(--primary-color);"></i>
+                       
                         <h4>Affordable</h4>
                         <p class="text-muted">Great quality at reasonable prices</p>
                     </div>
@@ -296,7 +296,7 @@ $products = mysqli_query($myconnection,
                                         <?= $product['price'] ?> LE
                                     </span>
                                     <button class="btn btn-sm" style="background-color: var(--secondary-color);" onclick="event.stopPropagation(); window.location='login.php'">
-                                        <i class="fas fa-plus"></i> Order Now
+                                        Order Now
                                     </button>
                                 </div>
                             </div>

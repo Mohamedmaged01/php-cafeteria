@@ -98,7 +98,7 @@ $items = mysqli_query($myconnection, "
             <div class="order-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="h3 mb-0">
-                        <i class="fas fa-receipt"></i> Order #<?= $order_data['id'] ?>
+                     Order #<?= $order_data['id'] ?>
                     </h1>
                     <span class="badge 
                         <?= $order_data['status'] == 'Processing' ? 'bg-warning' : 
@@ -182,10 +182,10 @@ $items = mysqli_query($myconnection, "
                 <div class="d-flex justify-content-between">
                 <a href="index.php" class="btn btn-outline-secondary">
 
-                        <i class="fas fa-arrow-left me-2"></i>Back to Menu
+                       Back to Menu
                     </a>
                     <a href="list.php" class="btn btn-coffee">
-                        <i class="fas fa-history me-2"></i>Edit My Order
+                       Edit My Order
                     </a>
                 </div>
             </div>
