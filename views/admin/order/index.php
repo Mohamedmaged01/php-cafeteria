@@ -9,19 +9,40 @@ session_start();
 // }
 
 
+$category_filter = isset($_GET['category']) ? (int)$_GET['category'] : 0;
+
 $per_page = 8;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page > 1) ? ($page * $per_page) - $per_page : 0;
 
 
-$total = mysqli_query($myconnection, "SELECT COUNT(*) as total FROM products WHERE available = 1");
+$products_query = "SELECT p.*, c.name as category_name FROM products p 
+                  LEFT JOIN categories c ON p.category_id = c.id 
+                  WHERE p.available = 1";
+
+
+if ($category_filter > 0) {
+    $products_query .= " AND p.category_id = $category_filter";
+}
+
+
+$total_query = "SELECT COUNT(*) as total FROM products WHERE available = 1";
+if ($category_filter > 0) {
+    $total_query .= " AND category_id = $category_filter";
+}
+
+$total = mysqli_query($myconnection, $total_query);
 $total = mysqli_fetch_assoc($total)['total'];
 $pages = ceil($total / $per_page);
 
-$products = mysqli_query($myconnection, 
-    "SELECT p.*, c.name as category_name FROM products p 
-     LEFT JOIN categories c ON p.category_id = c.id 
-     WHERE p.available = 1 LIMIT $start, $per_page");
+
+$products_query .= " LIMIT $start, $per_page";
+
+
+$products = mysqli_query($myconnection, $products_query);
+
+
+$categories = mysqli_query($myconnection, "SELECT * FROM categories");
 
 
 $rooms = mysqli_query($myconnection, "SELECT * FROM rooms WHERE status = 'available'");
@@ -43,120 +64,120 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
       
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-    
-        .product-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
-        
-       
-        .order-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .order-item-img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #eee;
-        }
-        
-        .order-item-details {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .order-item-buttons {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
       
-        .btn-brown {
-            background-color: #6F4E37;
-            color: white;
-            border-color: #5a3c2a;
-            transition: all 0.3s;
-        }
-        
-        .btn-brown:hover {
-            background-color: #5a3c2a;
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        .btn-outline-brown {
-            color: #6F4E37;
-            border-color: #6F4E37;
-        }
-        
-        .btn-outline-brown:hover {
-            background-color: #6F4E37;
-            color: white;
-        }
-       
-        .pagination .page-link {
-            color: #6F4E37;
-            border-color: #d2b48c;
-        }
-        
-        .pagination .page-item.active .page-link {
-            background-color: #6F4E37;
-            border-color: #6F4E37;
-            color: white;
-        }
-        
-        .pagination .page-item:hover .page-link {
-            background-color: #f5f5f5;
-        }
-        
-        
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1100;
-        }
-        
-    
-        .order-section {
-            background: #f9f9f9;
-            border-left: 1px solid #eee;
-            height: 100vh;
-            position: sticky;
-            top: 0;
-        }
-        
+  
+      .product-card {
+          transition: all 0.3s ease;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          border-radius: 10px;
+          overflow: hidden;
+      }
       
-        @media (max-width: 992px) {
-            .order-section {
-                height: auto;
-                position: relative;
-            }
-        }
-    </style>
+      .product-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      }
+      
+     
+      .order-item {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          padding: 10px 0;
+          border-bottom: 1px solid #eee;
+      }
+      
+      .order-item-img {
+          width: 60px;
+          height: 60px;
+          object-fit: cover;
+          border-radius: 8px;
+          border: 1px solid #eee;
+      }
+      
+      .order-item-details {
+          flex: 1;
+          min-width: 0;
+      }
+      
+      .order-item-buttons {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+      }
+      
+    
+      .btn-brown {
+          background-color: #6F4E37;
+          color: white;
+          border-color: #5a3c2a;
+          transition: all 0.3s;
+      }
+      
+      .btn-brown:hover {
+          background-color: #5a3c2a;
+          color: white;
+          transform: translateY(-2px);
+      }
+      
+      .btn-outline-brown {
+          color: #6F4E37;
+          border-color: #6F4E37;
+      }
+      
+      .btn-outline-brown:hover {
+          background-color: #6F4E37;
+          color: white;
+      }
+     
+      .pagination .page-link {
+          color: #6F4E37;
+          border-color: #d2b48c;
+      }
+      
+      .pagination .page-item.active .page-link {
+          background-color: #6F4E37;
+          border-color: #6F4E37;
+          color: white;
+      }
+      
+      .pagination .page-item:hover .page-link {
+          background-color: #f5f5f5;
+      }
+      
+      
+      .toast-container {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 1100;
+      }
+      
+  
+      .order-section {
+          background: #f9f9f9;
+          border-left: 1px solid #eee;
+          height: 100vh;
+          position: sticky;
+          top: 0;
+      }
+      
+    
+      @media (max-width: 992px) {
+          .order-section {
+              height: auto;
+              position: relative;
+          }
+      }
+  </style>
 </head>
 <body>
-    <!-- Toast Notification -->
+    
     <div class="toast-container">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -173,13 +194,28 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
             <div class="col-lg-8 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
                     <h2 class="mb-3 mb-md-0"><i class="fas fa-coffee me-2"></i>Our Menu</h2>
-                    <div class="search-box" style="width: 100%; max-width: 300px;">
-                        <div class="input-group">
-                            <input type="text" id="search-input" class="form-control" placeholder="Search products..." 
-                                   aria-label="Search products">
-                            <button class="btn btn-brown" type="button" id="search-button">
-                                <i class="fas fa-search"></i>
-                            </button>
+                    <div class="d-flex gap-3">
+                        <!-- Category Filter Dropdown -->
+                        <div class="search-box" style="width: 200px;">
+                            <select id="category-filter" class="form-select" onchange="filterByCategory(this.value)">
+                                <option value="0">All Categories</option>
+                                <?php while($category = mysqli_fetch_assoc($categories)): ?>
+                                    <option value="<?= $category['id'] ?>" <?= $category_filter == $category['id'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($category['name']) ?>
+                                    </option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        
+                        <!-- Search Box -->
+                        <div class="search-box" style="width: 100%; max-width: 300px;">
+                            <div class="input-group">
+                                <input type="text" id="search-input" class="form-control" placeholder="Search products..." 
+                                       aria-label="Search products">
+                                <button class="btn btn-brown" type="button" id="search-button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -223,7 +259,7 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
                         <ul class="pagination justify-content-center">
                             <?php if($page > 1): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=<?= $page-1 ?>" aria-label="Previous">
+                                    <a class="page-link" href="?page=<?= $page-1 ?><?= $category_filter ? '&category='.$category_filter : '' ?>" aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
@@ -231,13 +267,13 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
                             
                             <?php for($i = 1; $i <= $pages; $i++): ?>
                                 <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
-                                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                    <a class="page-link" href="?page=<?= $i ?><?= $category_filter ? '&category='.$category_filter : '' ?>"><?= $i ?></a>
                                 </li>
                             <?php endfor; ?>
                             
                             <?php if($page < $pages): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=<?= $page+1 ?>" aria-label="Next">
+                                    <a class="page-link" href="?page=<?= $page+1 ?><?= $category_filter ? '&category='.$category_filter : '' ?>" aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
@@ -247,7 +283,6 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
                 <?php endif; ?>
             </div>
             
-            <!-- Order Section -->
             <div class="col-lg-4 p-4 order-section">
                 <h3 class="mb-4"><i class="fas fa-receipt me-2"></i>Place Order</h3>
                 <form method="post" action="create.php" id="order-form">
@@ -325,7 +360,18 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      
+        function filterByCategory(categoryId) {
+            const url = new URL(window.location.href);
+            
+            if (categoryId > 0) {
+                url.searchParams.set('category', categoryId);
+            } else {
+                url.searchParams.delete('category');
+            }
+            
+            window.location.href = url.toString();
+        }
+
         let order = {};
         const toastLiveExample = document.getElementById('liveToast');
         const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);

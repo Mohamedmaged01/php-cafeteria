@@ -6,23 +6,19 @@ $_SESSION['user_id'] = 1;
 $_SESSION['user_name'] = "Aya";
 $_SESSION['user_image'] = "default-user.jpg"; 
 
-
 $per_page = 8;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page > 1) ? ($page * $per_page) - $per_page : 0;
-
 
 $total = mysqli_query($myconnection, "SELECT COUNT(*) as total FROM products WHERE available = 1");
 $total = mysqli_fetch_assoc($total)['total'];
 $pages = ceil($total / $per_page);
 
-
 $products = mysqli_query($myconnection, 
     "SELECT * FROM products WHERE available = 1 LIMIT $start, $per_page");
 
-
-    $rooms = mysqli_query($myconnection, "SELECT * FROM rooms WHERE status = 'available'");
-
+$rooms = mysqli_query($myconnection, "SELECT * FROM rooms WHERE status = 'available'");
+$categories = mysqli_query($myconnection, "SELECT * FROM categories");
 ?>
 
 <!DOCTYPE html>
@@ -35,73 +31,60 @@ $products = mysqli_query($myconnection,
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .navbar-custom {
-    background-color: #6F4E37;
-    padding: 15px 0; 
-    height: 80px; 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
-}
+            background-color: #6F4E37;
+            padding: 15px 0; 
+            height: 80px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
 
-.navbar-brand {
-    font-size: 1.8rem; 
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-}
+        .navbar-brand {
+            font-size: 1.8rem; 
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
 
-.navbar-brand i {
-    font-size: 2rem;
-    margin-right: 10px;
-}
+        .navbar-brand i {
+            font-size: 2rem;
+            margin-right: 10px;
+        }
 
-.nav-link {
-    font-size: 1.1rem; 
-    padding: 10px 15px !important;
-    margin: 0 5px;
-    border-radius: 5px;
-    transition: all 0.3s;
-}
+        .nav-link {
+            font-size: 1.1rem; 
+            padding: 10px 15px !important;
+            margin: 0 5px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
 
-.nav-link:hover {
-    background-color: rgba(255,255,255,0.1);
-}
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
 
-.user-avatar {
-    width: 50px; 
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #C4A484; 
-    transition: all 0.3s;
-}
+        .user-avatar {
+            width: 50px; 
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #C4A484; 
+            transition: all 0.3s;
+        }
 
-.user-avatar:hover {
-    transform: scale(1.05); 
-}
+        .user-avatar:hover {
+            transform: scale(1.05); 
+        }
 
-.user-name {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-right: 15px;
-    color: white;
-}
+        .user-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-right: 15px;
+            color: white;
+        }
 
-.navbar-toggler {
-    padding: 0.5rem 0.75rem;
-    font-size: 1.25rem;
-}
-
-
-    
-    .nav-link {
-        margin: 5px 0;
-        padding: 8px 12px !important;
-    }
-    
-    .user-info {
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid rgba(255,255,255,0.1);
-    }
+        .navbar-toggler {
+            padding: 0.5rem 0.75rem;
+            font-size: 1.25rem;
+        }
 
         .btn-coffee {
             background-color: #6F4E37;
@@ -148,57 +131,46 @@ $products = mysqli_query($myconnection,
             object-fit: cover;
             border-radius: 5px;
         }
-        .btn-coffee {
-            background-color: #6F4E37;
-            color: white;
+        .search-box {
+            transition: all 0.3s ease;
         }
-        .btn-coffee:hover {
-            background-color: #5a3c2a;
-            color: white;
+        .search-box:focus-within {
+            box-shadow: 0 0 0 0.25rem rgba(111, 78, 55, 0.25);
         }
-        .page-item.active .page-link {
-            background-color: #6F4E37;
+        #search-input {
             border-color: #6F4E37;
         }
-        .page-link {
-            color: #6F4E37;
+        #search-input:focus {
+            border-color: #6F4E37;
+            box-shadow: 0 0 0 0.25rem rgba(111, 78, 55, 0.25);
         }
-        .search-box {
-    transition: all 0.3s ease;
-}
-
-.search-box:focus-within {
-    box-shadow: 0 0 0 0.25rem rgba(111, 78, 55, 0.25);
-}
-
-#search-input {
-    border-color: #6F4E37;
-}
-
-#search-input:focus {
-    border-color: #6F4E37;
-    box-shadow: 0 0 0 0.25rem rgba(111, 78, 55, 0.25);
-}
-
-/* إضافة أنيميشن */
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-5px); }
-    40%, 80% { transform: translateX(5px); }
-}
-
-.animate__headShake {
-    animation-name: shake;
-    animation-duration: 1s;
-    animation-fill-mode: both;
-}
-
-/* رسالة التحذير */
-.alert-warning {
-    background-color: #fff3cd;
-    color: #856404;
-    border-left: 4px solid #ffeeba;
-}
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .animate__headShake {
+            animation-name: shake;
+            animation-duration: 1s;
+            animation-fill-mode: both;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffeeba;
+        }
+        .btn-outline-coffee {
+            color: #6F4E37;
+            border-color: #6F4E37;
+        }
+        .btn-outline-coffee:hover {
+            background-color: #6F4E37;
+            color: white;
+        }
+        .btn-outline-coffee.active {
+            background-color: #6F4E37;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -230,11 +202,11 @@ $products = mysqli_query($myconnection,
 
     <div class="container-fluid">
         <div class="row">
-          
-        <div class="col-lg-8 p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <h2 class="mb-3 mb-md-0 text-coffee"><i class="fas fa-coffee me-2"></i>Our Menu</h2>
-        <div class="search-box" style="width: 100%; max-width: 300px;">
+            <div class="col-lg-8 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <h2 class="mb-3 mb-md-0 text-coffee"><i class="fas fa-coffee me-2"></i>Our Menu</h2>
+    <div class="d-flex gap-2 flex-wrap" style="width: 100%; max-width: 500px;">
+        <div class="search-box flex-grow-1" style="min-width: 200px;">
             <div class="input-group">
                 <input type="text" id="search-input" class="form-control" placeholder="Search products..." 
                        aria-label="Search products">
@@ -243,37 +215,64 @@ $products = mysqli_query($myconnection,
                 </button>
             </div>
         </div>
+        <div class="search-box" style="width: 200px;">
+            <select id="category-filter" class="form-select" onchange="filterProducts(this.value)">
+                <option value="all">All Categories</option>
+                <?php 
+                mysqli_data_seek($categories, 0); // Reset categories pointer
+                while($category = mysqli_fetch_assoc($categories)): ?>
+                    <option value="<?= $category['id'] ?>">
+                        <?= htmlspecialchars($category['name']) ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+        </div>
     </div>
-    
-    <div class="row" id="products-container">
-        <?php 
-        mysqli_data_seek($products, 0);
-        $hasProducts = false;
-        while($product = mysqli_fetch_assoc($products)): 
-            $hasProducts = true;
-        ?>
-            <div class="col-xl-3 col-lg-4 col-md-6 mb-4 product-item">
-                <div class="card product-card h-100" 
-                     onclick="addToOrder(<?= $product['id'] ?>, '<?= htmlspecialchars($product['name'], ENT_QUOTES) ?>', <?= $product['price'] ?>, '<?= $product['image'] ?>')">
-                    <img src="/php-cafeteria/public/uploads/<?= $product['image'] ?>" 
-                         class="card-img-top" 
-                         style="height: 180px; object-fit: cover;" 
-                         alt="<?= htmlspecialchars($product['name'], ENT_QUOTES) ?>">
-                    <div class="card-body">
-                        <h5 class="card-title"><?= htmlspecialchars($product['name'], ENT_QUOTES) ?></h5>
-                        <p class="card-text text-success"><?= number_format($product['price'], 2) ?> LE</p>
+</div>
+
+                <!-- Filter Section -->
+                <div class="mb-4">
+                    <div class="btn-group" role="group" aria-label="Product filters">
+                        <button type="button" class="btn btn-outline-coffee active" onclick="filterProducts('all')">
+                            <i class="fas fa-list me-1"></i> All Items
+                        </button>
+                        <?php while($category = mysqli_fetch_assoc($categories)): ?>
+                            <button type="button" class="btn btn-outline-coffee" onclick="filterProducts(<?= $category['id'] ?>)">
+                                <?= htmlspecialchars($category['name']) ?>
+                            </button>
+                        <?php endwhile; ?>
                     </div>
                 </div>
-            </div>
-        <?php endwhile; ?>
-        
-        <?php if(!$hasProducts): ?>
-            <div class="col-12 text-center py-5 no-products-message">
-                <i class="fas fa-coffee fa-3x mb-3 text-muted"></i>
-                <h4 class="text-muted">No products available</h4>
-            </div>
-        <?php endif; ?>
-    </div>
+
+                <div class="row" id="products-container">
+                    <?php 
+                    mysqli_data_seek($products, 0);
+                    $hasProducts = false;
+                    while($product = mysqli_fetch_assoc($products)): 
+                        $hasProducts = true;
+                    ?>
+                        <div class="col-xl-3 col-lg-4 col-md-6 mb-4 product-item" data-category="<?= $product['category_id'] ?>">
+                            <div class="card product-card h-100" 
+                                 onclick="addToOrder(<?= $product['id'] ?>, '<?= htmlspecialchars($product['name'], ENT_QUOTES) ?>', <?= $product['price'] ?>, '<?= $product['image'] ?>')">
+                                <img src="/php-cafeteria/public/uploads/<?= $product['image'] ?>" 
+                                     class="card-img-top" 
+                                     style="height: 180px; object-fit: cover;" 
+                                     alt="<?= htmlspecialchars($product['name'], ENT_QUOTES) ?>">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?= htmlspecialchars($product['name'], ENT_QUOTES) ?></h5>
+                                    <p class="card-text text-success"><?= number_format($product['price'], 2) ?> LE</p>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                    
+                    <?php if(!$hasProducts): ?>
+                        <div class="col-12 text-center py-5 no-products-message">
+                            <i class="fas fa-coffee fa-3x mb-3 text-muted"></i>
+                            <h4 class="text-muted">No products available</h4>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
                 <!-- Pagination -->
                 <?php if($pages > 1): ?>
@@ -305,7 +304,6 @@ $products = mysqli_query($myconnection,
                 <?php endif; ?>
             </div>
             
-            
             <div class="col-lg-4 p-4 order-section">
                 <h3 class="mb-4"><i class="fas fa-receipt me-2"></i>Your Order</h3>
                 <form method="post" action="create.php" id="order-form">
@@ -319,14 +317,13 @@ $products = mysqli_query($myconnection,
                     </div>
                     
                     <div class="mb-3">
-    <label for="room" class="form-label"><i class="fas fa-door-open me-2"></i>Room Number</label>
-    <select name="room_id" id="room" class="form-select">
-        <?php while($room = mysqli_fetch_assoc($rooms)): ?>
-            <option value="<?= $room['id'] ?>"><?= $room['number'] ?></option>
-        <?php endwhile; ?>
-    </select>
-</div>
-
+                        <label for="room" class="form-label"><i class="fas fa-door-open me-2"></i>Room Number</label>
+                        <select name="room_id" id="room" class="form-select">
+                            <?php while($room = mysqli_fetch_assoc($rooms)): ?>
+                                <option value="<?= $room['id'] ?>"><?= $room['number'] ?></option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
                     
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h5>Total:</h5>
@@ -335,8 +332,8 @@ $products = mysqli_query($myconnection,
                     
                     <input type="hidden" name="quantities" id="quantities-input">
                     <button type="submit" class="btn btn-coffee btn-lg w-100 py-3" id="confirm-btn" disabled>
-    <i class="fas fa-paper-plane me-2"></i> Confirm Order
-</button>
+                        <i class="fas fa-paper-plane me-2"></i> Confirm Order
+                    </button>
                 </form>
             </div>
         </div>
@@ -357,28 +354,28 @@ $products = mysqli_query($myconnection,
         
         function updateOrderList() {
             const list = document.getElementById('order-list');
-    const totalEl = document.getElementById('total-price');
-    const quantitiesInput = document.getElementById('quantities-input');
-    const confirmBtn = document.getElementById('confirm-btn');
-    
-    list.innerHTML = '';
-    let total = 0;
-    let quantities = {};
-    
-    if (Object.keys(order).length === 0) {
-        list.innerHTML = '<p class="text-muted text-center py-3">No items selected</p>';
-        totalEl.textContent = '0.00';
-        quantitiesInput.value = JSON.stringify({});
-        confirmBtn.disabled = true;
-        confirmBtn.classList.remove('btn-coffee');
-        confirmBtn.classList.add('btn-secondary');
-        return;
-    }
-    
-    
-    confirmBtn.disabled = false;
-    confirmBtn.classList.add('btn-coffee');
-    confirmBtn.classList.remove('btn-secondary');
+            const totalEl = document.getElementById('total-price');
+            const quantitiesInput = document.getElementById('quantities-input');
+            const confirmBtn = document.getElementById('confirm-btn');
+            
+            list.innerHTML = '';
+            let total = 0;
+            let quantities = {};
+            
+            if (Object.keys(order).length === 0) {
+                list.innerHTML = '<p class="text-muted text-center py-3">No items selected</p>';
+                totalEl.textContent = '0.00';
+                quantitiesInput.value = JSON.stringify({});
+                confirmBtn.disabled = true;
+                confirmBtn.classList.remove('btn-coffee');
+                confirmBtn.classList.add('btn-secondary');
+                return;
+            }
+            
+            confirmBtn.disabled = false;
+            confirmBtn.classList.add('btn-coffee');
+            confirmBtn.classList.remove('btn-secondary');
+            
             for (let id in order) {
                 const item = order[id];
                 total += item.price * item.quantity;
@@ -419,76 +416,138 @@ $products = mysqli_query($myconnection,
                 updateOrderList();
             }
         }
+        
         document.getElementById('search-input').addEventListener('input', performSearch);
 
-function performSearch() {
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const productItems = document.querySelectorAll('.product-item');
-    let hasResults = false;
-    
-    productItems.forEach(item => {
-        const productName = item.querySelector('.card-title').textContent.toLowerCase();
-        if (productName.includes(searchTerm)) {
-            item.style.display = 'block';
-            hasResults = true;
-        } else {
-            item.style.display = 'none';
+        function performSearch() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const productItems = document.querySelectorAll('.product-item');
+            let hasResults = false;
+            
+            productItems.forEach(item => {
+                const productName = item.querySelector('.card-title').textContent.toLowerCase();
+                if (productName.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            const noResultsMessage = document.querySelector('.no-results-message');
+            if (!hasResults && searchTerm.length > 0) {
+                if (!noResultsMessage) {
+                    const productsContainer = document.getElementById('products-container');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'col-12 text-center py-5 no-results-message';
+                    messageDiv.innerHTML = `
+                        <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                        <h4 class="text-muted">No results found for "${searchTerm}"</h4>
+                        <p class="text-muted">Try different keywords</p>
+                    `;
+                    productsContainer.appendChild(messageDiv);
+                }
+            } else if (noResultsMessage) {
+                noResultsMessage.remove();
+            }
         }
-    });
-    
-   
-    const noResultsMessage = document.querySelector('.no-results-message');
-    if (!hasResults && searchTerm.length > 0) {
-        if (!noResultsMessage) {
-            const productsContainer = document.getElementById('products-container');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'col-12 text-center py-5 no-results-message';
-            messageDiv.innerHTML = `
-                <i class="fas fa-search fa-3x mb-3 text-muted"></i>
-                <h4 class="text-muted">No results found for "${searchTerm}"</h4>
-                <p class="text-muted">Try different keywords</p>
-            `;
-            productsContainer.appendChild(messageDiv);
+
+        function filterProducts(categoryId) {
+            const allItems = document.querySelectorAll('.product-item');
+            
+            allItems.forEach(item => {
+                if (categoryId === 'all') {
+                    item.style.display = 'block';
+                } else {
+                    if (item.dataset.category == categoryId) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Reset search input when filtering
+            document.getElementById('search-input').value = '';
+            
+            // Remove any no-results message if present
+            const noResultsMessage = document.querySelector('.no-results-message');
+            if (noResultsMessage) noResultsMessage.remove();
+            
+            // Highlight the active filter button
+            document.querySelectorAll('.btn-outline-coffee').forEach(btn => {
+                btn.classList.remove('active', 'btn-coffee');
+                btn.classList.add('btn-outline-coffee');
+            });
+            
+            const buttons = document.querySelectorAll('.btn-outline-coffee');
+            if (categoryId === 'all') {
+                buttons[0].classList.add('active', 'btn-coffee');
+                buttons[0].classList.remove('btn-outline-coffee');
+            } else {
+                buttons[categoryId].classList.add('active', 'btn-coffee');
+                buttons[categoryId].classList.remove('btn-outline-coffee');
+            }
         }
-    } else if (noResultsMessage) {
-        noResultsMessage.remove();
-    }
-}
 
-
-document.querySelectorAll('.page-link').forEach(link => {
-    link.addEventListener('click', () => {
-        document.getElementById('search-input').value = '';
-        
-        document.querySelectorAll('.product-item').forEach(item => {
-            item.style.display = 'block';
+        document.querySelectorAll('.page-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('search-input').value = '';
+                
+                document.querySelectorAll('.product-item').forEach(item => {
+                    item.style.display = 'block';
+                });
+                
+                const noResultsMessage = document.querySelector('.no-results-message');
+                if (noResultsMessage) noResultsMessage.remove();
+            });
         });
-        
-        const noResultsMessage = document.querySelector('.no-results-message');
-        if (noResultsMessage) noResultsMessage.remove();
+
+        document.getElementById('order-form').addEventListener('submit', function(e) {
+            if (Object.keys(order).length === 0) {
+                e.preventDefault();
+                alert('Please add at least one item to your order before confirming');
+                
+                const orderList = document.getElementById('order-list');
+                orderList.innerHTML = `
+                    <div class="alert alert-warning text-center py-3">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Please add at least one item to your order
+                    </div>
+                `;
+                
+                document.querySelector('.order-section').classList.add('animate__animated', 'animate__headShake');
+                setTimeout(() => {
+                    document.querySelector('.order-section').classList.remove('animate__animated', 'animate__headShake');
+                }, 1000);
+            }
+        });
+
+        function filterProducts(categoryId) {
+    const allItems = document.querySelectorAll('.product-item');
+    
+    allItems.forEach(item => {
+        if (categoryId === 'all') {
+            item.style.display = 'block';
+        } else {
+            if (item.dataset.category == categoryId) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        }
     });
-});
-
-document.getElementById('order-form').addEventListener('submit', function(e) {
-    if (Object.keys(order).length === 0) {
-        e.preventDefault();
-        alert('Please add at least one item to your order before confirming');
-        
-        const orderList = document.getElementById('order-list');
-        orderList.innerHTML = `
-            <div class="alert alert-warning text-center py-3">
-                <i class="fas fa-exclamation-circle me-2"></i>
-                Please add at least one item to your order
-            </div>
-        `;
-        
-        document.querySelector('.order-section').classList.add('animate__animated', 'animate__headShake');
-        setTimeout(() => {
-            document.querySelector('.order-section').classList.remove('animate__animated', 'animate__headShake');
-        }, 1000);
-    }
-});
-
+    
+    // Reset search input when filtering
+    document.getElementById('search-input').value = '';
+    
+    // Remove any no-results message if present
+    const noResultsMessage = document.querySelector('.no-results-message');
+    if (noResultsMessage) noResultsMessage.remove();
+    
+    // Update the dropdown to show selected option
+    document.getElementById('category-filter').value = categoryId;
+}
     </script>
 </body>
 </html>
