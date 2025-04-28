@@ -4,7 +4,7 @@ session_start();
 
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php?redirect=dashboard");
+    header("Location: ../../Authentication/login.php");
     exit;
 }
 

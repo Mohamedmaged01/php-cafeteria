@@ -6,8 +6,8 @@ define('DB_PASS', '');
 define('DB_NAME', 'PHP_Project');
 
 if (!isset($_SESSION['user_id'])) {
-  header("Location: login.php");
-  exit;
+    header("Location: ../../../Authentication/login.php");
+    exit;
 }
 $user_id = $_SESSION['user_id'];
 $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);

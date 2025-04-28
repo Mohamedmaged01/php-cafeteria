@@ -2,8 +2,8 @@
 include_once '../../../config/db.php';
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1;
-    $_SESSION['user_name'] = "Aya";
+    header("Location: ../../../Authentication/login.php");
+    exit;
 }
 $order_id = intval($_GET['id']);
 $order = mysqli_query($myconnection, "SELECT * FROM orders WHERE id = $order_id");

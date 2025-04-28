@@ -1,15 +1,11 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
 session_start();
 include_once 'connect.php';
-
 $error = '';
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $myconnection->real_escape_string($_POST['email']);
-    
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Please enter a valid email address';
     } else {
@@ -19,17 +15,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
         $stmt->close();
-        
         if ($user) {
             $reset_token = bin2hex(random_bytes(32));
             $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
-            
             $_SESSION['reset_token'] = $reset_token;
             $_SESSION['reset_token_expiry'] = $expiry;
             $_SESSION['reset_user_id'] = $user['id'];
-            
             $reset_link = "reset_password.php?token=$reset_token";
-            
             header("Location: $reset_link");
             exit();
         } else {
@@ -44,15 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password - Cafeteria System</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #6F4E37; /* Coffee brown */
-            --secondary-color: #5a3c2a; /* Darker coffee */
-            --accent-color: #C4A484; /* Light coffee */
+            --primary-color: #6F4E37; 
+            --secondary-color: #5a3c2a; 
+            --accent-color: #C4A484; 
             --light-color: #f8f9fa;
             --dark-color: #212529;
         }
@@ -216,7 +206,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </svg>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
