@@ -8,12 +8,12 @@ require_once __DIR__ . '/auth.php';
 
 // Admin authentication
 if (!isset($_SESSION['user_id'])) {
-    header('Location: /project/php-cafeteria/Authentication/login.php ');
+    header('Location: ../../../Authentication/login.php');
     exit();
 }
 
 if ($_SESSION['user_role'] != 'admin') {
-    header('Location: /project/php-cafeteria/Authentication/login.php ');
+    header('Location: ../../../Authentication/login.php');
     exit();
 }
 

@@ -1,7 +1,7 @@
 <?php
 session_start();
 include_once"./connect.php"; 
-require_once __DIR__ . '/../Authentication/allusers/auth.php';
+require_once __DIR__ . './allusers/auth.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -153,19 +153,19 @@ checkAdminAuth();
                     <a href="dashboard.php"><i class="fas fa-home me-2"></i> Dashboard</a>
                 </li>
                 <li>
-                    <a href="../Authentication/allusers/list.php"><i class="fas fa-users me-2"></i> Users</a>
+                    <a href="./allusers/list.php"><i class="fas fa-users me-2"></i> Users</a>
                 </li>
                 <li>
-                    <a href="../categories/list.php"><i class="fas fa-tags me-2"></i> Categories</a>
+                    <a href="./category/list.php"><i class="fas fa-tags me-2"></i> Categories</a>
                 </li>
                 <li>
-                    <a href="../products/list.php"><i class="fas fa-mug-hot me-2"></i> Products</a>
+                    <a href="./product/list.php"><i class="fas fa-mug-hot me-2"></i> Products</a>
                 </li>
                 <li>
-                    <a href="../orders/list.php"><i class="fas fa-receipt me-2"></i> Orders</a>
+                    <a href="./order/list.php"><i class="fas fa-receipt me-2"></i> Orders</a>
                 </li>
                 <li>
-                    <a href="./logout.php"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+                    <a href="../../Authentication/logout.php"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
                 </li>
             </ul>
         </div>
@@ -385,7 +385,7 @@ checkAdminAuth();
                                 </table>
                             </div>
                             <div class="text-end mt-3">
-                                <a href="../Authentication/allusers/list.php" class="btn btn-coffee">View All Users</a>
+                                <a href="./allusers/list.php" class="btn btn-coffee">View All Users</a>
                             </div>
                         </div>
                     </div>
