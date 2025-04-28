@@ -2,25 +2,36 @@
 include_once '../../config/db.php';
 session_start();
 
-
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../../Authentication/login.php");
     exit;
 }
 
-
 $per_page = 6;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page > 1) ? ($page * $per_page) - $per_page : 0;
 
+// Get all categories for filter
+$categories = mysqli_query($myconnection, "SELECT * FROM categories");
+$category_filter = isset($_GET['category']) ? (int)$_GET['category'] : null;
 
-$total = mysqli_query($myconnection, "SELECT COUNT(*) as total FROM products WHERE available = 1");
-$total = mysqli_fetch_assoc($total)['total'];
+// Build the base query
+$query = "SELECT p.* FROM products p WHERE p.available = 1";
+
+// Add category filter if selected
+if ($category_filter && $category_filter > 0) {
+    $query .= " AND p.category_id = $category_filter";
+}
+
+// Get total count for pagination
+$total_query = str_replace("SELECT p.*", "SELECT COUNT(*) as total", $query);
+$total_result = mysqli_query($myconnection, $total_query);
+$total = mysqli_fetch_assoc($total_result)['total'];
 $pages = ceil($total / $per_page);
 
-
-$products = mysqli_query($myconnection, 
-    "SELECT * FROM products WHERE available = 1 LIMIT $start, $per_page");
+// Add pagination to main query
+$query .= " LIMIT $start, $per_page";
+$products = mysqli_query($myconnection, $query);
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +54,6 @@ $products = mysqli_query($myconnection,
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light-coffee);
         }
-        
         
         .hero-section {
             background: linear-gradient(rgba(0, 0, 0, 0.5), url('https://t4.ftcdn.net/jpg/09/18/25/37/360_F_918253796_lcXm9jXRawgMoz228HlYrfSVPzpCYohe.jpg')) !important;
@@ -79,53 +89,54 @@ $products = mysqli_query($myconnection,
         }
 
         .navbar-custom {
-    background-color: var(--primary-color);
-    padding: 1.5rem 0; 
-    height: 80px; 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-    position: relative;
-    z-index: 1000;
-}
+            background-color: var(--primary-color);
+            padding: 1.5rem 0; 
+            height: 80px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            position: relative;
+            z-index: 1000;
+        }
 
-.navbar-brand {
-    font-size: 1.8rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    color: white !important;
-    transition: all 0.3s ease;
-}
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            color: white !important;
+            transition: all 0.3s ease;
+        }
 
-.navbar-brand i {
-    font-size: 2rem;
-    margin-right: 12px;
-    color: var(--secondary-color);
-}
+        .navbar-brand i {
+            font-size: 2rem;
+            margin-right: 12px;
+            color: var(--secondary-color);
+        }
 
-.navbar-brand:hover {
-    transform: translateY(-2px);
-}
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+        }
 
-.nav-link {
-    font-size: 1.1rem;
-    font-weight: 500;
-    padding: 0.8rem 1.5rem !important;
-    margin: 0 0.5rem;
-    color: white !important;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
+        .nav-link {
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 0.8rem 1.5rem !important;
+            margin: 0 0.5rem;
+            color: white !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
 
-.nav-link:hover {
-    background-color: rgba(255,255,255,0.15);
-    transform: translateY(-2px);
-    color: var(--secondary-color) !important;
-}
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+            color: var(--secondary-color) !important;
+        }
 
-.nav-link.active {
-    background-color: var(--secondary-color);
-    color: var(--accent-color) !important;
-}
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: var(--accent-color) !important;
+        }
+        
         .btn-login {
             background-color: var(--secondary-color);
             color: var(--accent-color);
@@ -208,6 +219,33 @@ $products = mysqli_query($myconnection,
         .page-link {
             color: var(--primary-color);
         }
+        
+        /* New styles for category filter */
+        .category-filter {
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .category-filter h5 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .category-btn {
+            margin: 5px;
+            border-radius: 50px;
+            padding: 8px 20px;
+            transition: all 0.3s;
+        }
+        
+        .category-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -218,7 +256,7 @@ $products = mysqli_query($myconnection,
                 Café Delight
             </a>
             <div class="ml-auto">
-                <a href="./../user/auth/login.php" class="btn btn-login">
+                <a href="../../Authentication/login.php" class="btn btn-login">
                     Login
                 </a>
             </div>
@@ -234,7 +272,7 @@ $products = mysqli_query($myconnection,
                 <a href="#products" class="btn btn-coffee btn-lg px-4">
                     Explore Menu
                 </a>
-                <a href="./../user/auth/login.php" class="btn btn-coffee-outline btn-lg px-4">
+                <a href="../../Authentication/register.php" class="btn btn-coffee-outline btn-lg px-4">
                      Sign In
                 </a>
             </div>
@@ -281,6 +319,23 @@ $products = mysqli_query($myconnection,
         <div class="container">
             <h2 class="text-center mb-5 fw-bold" style="color: var(--primary-color);">Our Menu</h2>
             
+            <!-- Category Filter -->
+            <div class="category-filter mb-5">
+                <h5 class="text-center">Filter by Category</h5>
+                <div class="d-flex flex-wrap justify-content-center">
+                    <a href="?category=0" 
+                       class="btn btn-outline-secondary category-btn <?= !$category_filter ? 'active' : '' ?>">
+                        All Items
+                    </a>
+                    <?php while($category = mysqli_fetch_assoc($categories)): ?>
+                        <a href="?category=<?= $category['id'] ?>" 
+                           class="btn btn-outline-secondary category-btn <?= $category_filter == $category['id'] ? 'active' : '' ?>">
+                            <?= htmlspecialchars($category['name']) ?>
+                        </a>
+                    <?php endwhile; ?>
+                </div>
+            </div>
+            
             <div class="row g-4">
                 <?php while($product = mysqli_fetch_assoc($products)): ?>
                     <div class="col-lg-4 col-md-6">
@@ -305,13 +360,12 @@ $products = mysqli_query($myconnection,
                 <?php endwhile; ?>
             </div>
             
-            
             <?php if($pages > 1): ?>
                 <nav class="mt-5">
                     <ul class="pagination justify-content-center">
                         <?php if($page > 1): ?>
                             <li class="page-item">
-                                <a class="page-link" href="?page=<?= $page-1 ?>" aria-label="Previous">
+                                <a class="page-link" href="?page=<?= $page-1 ?><?= $category_filter ? "&category=$category_filter" : '' ?>" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -319,13 +373,13 @@ $products = mysqli_query($myconnection,
                         
                         <?php for($i = 1; $i <= $pages; $i++): ?>
                             <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
-                                <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                <a class="page-link" href="?page=<?= $i ?><?= $category_filter ? "&category=$category_filter" : '' ?>"><?= $i ?></a>
                             </li>
                         <?php endfor; ?>
                         
                         <?php if($page < $pages): ?>
                             <li class="page-item">
-                                <a class="page-link" href="?page=<?= $page+1 ?>" aria-label="Next">
+                                <a class="page-link" href="?page=<?= $page+1 ?><?= $category_filter ? "&category=$category_filter" : '' ?>" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
