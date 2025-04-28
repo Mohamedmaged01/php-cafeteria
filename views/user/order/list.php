@@ -297,7 +297,6 @@ $current_page_orders = array_slice($orders, $offset, $items_per_page);
             <span class="user-name"><?= htmlspecialchars($_SESSION['user_name']) ?></span>
             <span class="user-name"><?= htmlspecialchars($user_name) ?></span>
           <?php endif; ?>
-          <a href="profile.php" class="d-block">
             <img src="assets/default-avatar.jpg" alt="User" class="user-avatar">
           </a>
         </div>
@@ -322,7 +321,7 @@ $current_page_orders = array_slice($orders, $offset, $items_per_page);
           <button type="submit" class="btn btn-coffee flex-grow-1">
             <i class="fas fa-filter me-2"></i>Filter
           </button>
-          <a href="orders.php" class="btn btn-outline-secondary flex-grow-1">
+          <a href="list.php" class="btn btn-outline-secondary flex-grow-1">
             <i class="fas fa-redo me-2"></i>Reset
           </a>
         </div>
