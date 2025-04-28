@@ -2,10 +2,9 @@
 include_once '../../../config/db.php';
 
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../../../Authentication/login.php");
-    exit;
-}
+$_SESSION['user_id'] = 1;
+$_SESSION['user_name'] = "Aya";
+$_SESSION['user_image'] = "default-user.jpg"; 
 
 $per_page = 8;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -191,12 +190,12 @@ $categories = mysqli_query($myconnection, "SELECT * FROM categories");
                     </li>
                 </ul>
                 
-                <!-- <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center">
                     <span class="text-white me-2"><?= $_SESSION['user_name'] ?></span>
                     <img src="/php-cafeteria/public/uploads/<?= $_SESSION['user_image'] ?>" 
                          class="user-avatar" 
                          alt="User Avatar">
-                </div> -->
+                </div>
             </div>
         </div>
     </nav>

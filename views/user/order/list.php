@@ -294,6 +294,7 @@ $current_page_orders = array_slice($orders, $offset, $items_per_page);
         </ul>
         <div class="d-flex align-items-center user-info">
           <?php if (!empty($user_name)): ?>
+            <span class="user-name"><?= htmlspecialchars($_SESSION['user_name']) ?></span>
             <span class="user-name"><?= htmlspecialchars($user_name) ?></span>
           <?php endif; ?>
           <a href="profile.php" class="d-block">
