@@ -318,8 +318,6 @@ $products = mysqli_query($myconnection, $query);
     <section id="products" class="py-5 bg-white">
         <div class="container">
             <h2 class="text-center mb-5 fw-bold" style="color: var(--primary-color);">Our Menu</h2>
-            
-            <!-- Category Filter -->
             <div class="category-filter mb-5">
                 <h5 class="text-center">Filter by Category</h5>
                 <div class="d-flex flex-wrap justify-content-center">
@@ -339,7 +337,7 @@ $products = mysqli_query($myconnection, $query);
             <div class="row g-4">
                 <?php while($product = mysqli_fetch_assoc($products)): ?>
                     <div class="col-lg-4 col-md-6">
-                    <div class="product-card" onclick="window.location='../../views/user/auth/login.php?redirect=product&id=<?= $product['id'] ?>'">
+                    <div class="product-card" onclick="window.location='../../Authentication/login.php?redirect=product&id=<?= $product['id'] ?>'">
                             <img src="/php-cafeteria/public/uploads/<?= $product['image'] ?>" 
                                  class="product-img w-100" 
                                  alt="<?= $product['name'] ?>">
