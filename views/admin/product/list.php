@@ -2,21 +2,20 @@
 $servername = "localhost";
 $username = "root"; 
 $password = ""; 
-$dbname = "PHP_Project"; 
+$dbname = "php_project"; 
 
 $conn = mysqli_connect($servername, $username, $password, $dbname);
 
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
+session_start();
 
 $records_per_page = 5;
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $offset = ($page - 1) * $records_per_page;
-
 $sql = "SELECT * FROM products LIMIT $offset, $records_per_page";
 $result = mysqli_query($conn, $sql);
-
 $total_sql = "SELECT COUNT(*) AS total FROM products";
 $total_result = mysqli_query($conn, $total_sql);
 $total_row = mysqli_fetch_assoc($total_result);
@@ -29,10 +28,27 @@ if (isset($_GET['deleted']) && $_GET['deleted'] == 'success') {
 if (isset($_GET['created']) && $_GET['created'] == 'success') {
     $message = "Product added successfully";
 }
-
 if (isset($_GET['updated']) && $_GET['updated'] == 'success') {
     $message = "Product updated successfully";
 }
+if(isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $user_sql = "SELECT * FROM users WHERE id = $user_id";
+    $user_result = mysqli_query($conn, $user_sql);
+        if($user_result && mysqli_num_rows($user_result) > 0) {
+        $user = mysqli_fetch_assoc($user_result);
+        $username = $user['name'];
+                if(isset($user['picture']) && !empty($user['picture'])) {
+            $user_image = $user['picture'];
+        }
+    }
+}
+
+$debug_info = "<!-- Debug info: ";
+$debug_info .= "Session user_id: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'Not set') . ", ";
+$debug_info .= "Username: " . $username . ", ";
+$debug_info .= "Image path: " . $user_image;
+$debug_info .= " -->";
 ?>
 
 <!DOCTYPE html>
@@ -44,6 +60,7 @@ if (isset($_GET['updated']) && $_GET['updated'] == 'success') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Your existing styles */
         .navbar-custom {
             background-color: #6F4E37;
             padding: 15px 0; 
@@ -141,6 +158,8 @@ if (isset($_GET['updated']) && $_GET['updated'] == 'success') {
     </style>
 </head>
 <body>
+    <?php echo $debug_info;  ?>
+    
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
         <div class="container">
             <a class="navbar-brand" href="#">
@@ -163,8 +182,15 @@ if (isset($_GET['updated']) && $_GET['updated'] == 'success') {
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
-                    <span class="user-name">Admin</span>
-                    <img src="https://via.placeholder.com/150" alt="Admin" class="user-avatar">
+                    <span class="user-name"><?php echo $username; ?></span>
+                    <img src="<?php 
+                        echo (strpos($user_image, '/') === false && strpos($user_image, '\\') === false) 
+                             ? 'uploads/' . $user_image  
+                             : $user_image;              
+                    ?>" 
+                    alt="<?php echo $username; ?>" 
+                    class="user-avatar"
+                    onerror="this.onerror=null; this.src='default_avatar.png';">
                 </div>
             </div>
         </div>
@@ -205,7 +231,10 @@ if (isset($_GET['updated']) && $_GET['updated'] == 'success') {
                                 <td><?php echo htmlspecialchars($row['price']); ?> EGP</td>
                                 <td>
                                     <?php if(!empty($row['image'])): ?>
-                                        <img src="uploads/<?php echo htmlspecialchars($row['image']); ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" class="product-img">
+                                        <img src="uploads/<?php echo htmlspecialchars($row['image']); ?>" 
+                                             alt="<?php echo htmlspecialchars($row['name']); ?>" 
+                                             class="product-img"
+                                             onerror="this.onerror=null; this.src='default_product.png';">
                                     <?php else: ?>
                                         <div class="no-image bg-light text-center" style="width:50px;height:50px;line-height:50px;border-radius:4px;">X</div>
                                     <?php endif; ?>

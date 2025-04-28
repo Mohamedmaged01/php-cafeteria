@@ -2,11 +2,10 @@
 include_once '../../../config/db.php';
 session_start();
 
-// التحقق من صلاحيات المستخدم
-// if (($_SESSION['role'] ?? 'customer') !== 'admin') {
-//     header("Location: /php-cafeteria/views/user/order/index.php");
-//     exit;
-// }
+if (($_SESSION['role'] ?? 'customer') !== 'admin') {
+    header("Location: /php-cafeteria/views/user/order/index.php");
+    exit;
+}
 
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['user_id'] = 1;

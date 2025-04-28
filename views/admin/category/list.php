@@ -3,11 +3,9 @@ include_once '../../../config/db.php';
 session_start();
 
 
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1;
-    $_SESSION['user_name'] = "Aya";
-    $_SESSION['user_image'] = "default-avatar.jpg";
-    $_SESSION['role'] = "admin";
+if (($_SESSION['role'] ?? 'customer') !== 'admin') {
+    header("Location: /php-cafeteria/views/user/order/index.php");
+    exit;
 }
 
 $per_page = 6;
