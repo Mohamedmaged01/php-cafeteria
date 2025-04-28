@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $file_type = $_FILES['profile_pic']['type'];
         
         if (in_array($file_type, $allowed_types)) {
-            $upload_dir = 'uploads/profile_pics/';
+            $upload_dir = '../public/uploads/users/';
             
             if (!file_exists($upload_dir)) {
                 if (!mkdir($upload_dir, 0777, true)) {

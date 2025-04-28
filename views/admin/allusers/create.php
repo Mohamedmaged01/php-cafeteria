@@ -23,10 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Handle image upload
     $picture = null;
     if ($_FILES['picture']['error'] == UPLOAD_ERR_OK) {
-        $uploadBase = '/opt/lampp/htdocs/project/php-cafeteria/uploads/';
+        $uploadBase = '../../../public/uploads/users/';
         $uploadDir = $uploadBase . 'profile_pics/';
-
-        // Create directory if not exists
         if (!file_exists($uploadDir)) {
             if (!mkdir($uploadDir, 0777, true)) {
                 $_SESSION['error'] = "Failed to create upload directory";
@@ -36,14 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             chmod($uploadDir, 0755);
         }
 
-        // Check permissions
         if (!is_writable($uploadDir)) {
             $_SESSION['error'] = "Upload directory is not writable";
             header("Location: create.php");
             exit();
         }
 
-        // Validate file extension
         $file_ext = strtolower(pathinfo($_FILES['picture']['name'], PATHINFO_EXTENSION));
         $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
 
@@ -65,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Insert into database
     try {
         $stmt = $myconnection->prepare("INSERT INTO users (name, email, password, room, ext, role, picture) VALUES (?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {

@@ -45,8 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
         
        
         if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            $target_dir = "uploads/";
-            $image = time() . '_' . basename($_FILES["image"]["name"]); // Add timestamp to avoid duplicate names
+            $target_dir = "../../../public/uploads/products/";
+            $image = time() . '_' . basename($_FILES["image"]["name"]); 
             $target_file = $target_dir . $image;
             $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
             
