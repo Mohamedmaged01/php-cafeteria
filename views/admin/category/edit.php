@@ -2,10 +2,7 @@
 include_once '../../../config/db.php';
 session_start();
 
-if (($_SESSION['role'] ?? 'customer') !== 'admin') {
-    header("Location: /php-cafeteria/views/user/order/index.php");
-    exit;
-}
+
 
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['user_id'] = 1;
@@ -64,11 +61,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .table-responsive {
             overflow-x: auto;
         }
+     
     </style>
 </head>
 <body>
+
+<?php include('../navbar.php');
+ ?>
     <div class="d-flex">
-        
+  
 
         <!-- Main Content -->
         <div class="main-content w-75">

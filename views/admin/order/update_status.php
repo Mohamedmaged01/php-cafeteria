@@ -2,11 +2,6 @@
 include_once '../../../config/db.php';
 session_start();
 
-// Admin login check
-// if (!isset($_SESSION['admin_id'])) {
-//     header("Location: /php-cafeteria/views/admin/login.php");
-//     exit();
-// }
 
 $order_id = intval($_GET['id']);
 $new_status = $_GET['status'];

@@ -2,11 +2,6 @@
 include_once '../../../config/db.php';
 
 session_start();
-// Admin login check (commented out for testing)
-// if (!isset($_SESSION['admin_id'])) {
-//     header("Location: /php-cafeteria/views/admin/login.php");
-//     exit();
-// }
 
 
 $category_filter = isset($_GET['category']) ? (int)$_GET['category'] : 0;
@@ -177,6 +172,8 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
   </style>
 </head>
 <body>
+<?php include('../navbar.php');
+ ?>
     
     <div class="toast-container">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -230,7 +227,7 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
                         <div class="col-xl-3 col-lg-4 col-md-6 mb-4 product-item">
                             <div class="card product-card h-100" 
                                  onclick="addToOrder(<?= $product['id'] ?>, '<?= htmlspecialchars($product['name'], ENT_QUOTES) ?>', <?= $product['price'] ?>, '<?= $product['image'] ?>')">
-                                <img src="/php-cafeteria/public/uploads/<?= $product['image'] ?>" 
+                                <img src="/php-cafeteria/public/uploads/products/<?= $product['image'] ?>" 
                                      class="card-img-top" 
                                      style="height: 180px; object-fit: cover;" 
                                      alt="<?= htmlspecialchars($product['name'], ENT_QUOTES) ?>">
@@ -360,7 +357,36 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+           <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+     
+        function saveOrderState() {
+            localStorage.setItem('currentOrder', JSON.stringify(order));
+            localStorage.setItem('selectedUserId', document.getElementById('user_id').value);
+        }
+
+      
+        function loadOrderState() {
+            const savedOrder = localStorage.getItem('currentOrder');
+            const savedUserId = localStorage.getItem('selectedUserId');
+            
+            if (savedOrder) {
+                order = JSON.parse(savedOrder);
+                if (savedUserId) {
+                    document.getElementById('user_id').value = savedUserId;
+                    
+                    const event = new Event('change');
+                    document.getElementById('user_id').dispatchEvent(event);
+                }
+                updateOrderList();
+            }
+        }
+
+       
+        document.addEventListener('DOMContentLoaded', loadOrderState);
+
         function filterByCategory(categoryId) {
+            saveOrderState(); 
             const url = new URL(window.location.href);
             
             if (categoryId > 0) {
@@ -376,13 +402,11 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
         const toastLiveExample = document.getElementById('liveToast');
         const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
         
-        
         function showToast(message) {
             const toastBody = document.querySelector('.toast-body');
             toastBody.textContent = message;
             toastBootstrap.show();
         }
-        
         
         function addToOrder(id, name, price, image) {
             const userId = document.getElementById('user_id').value;
@@ -399,9 +423,9 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
                 showToast(`${name} quantity increased to ${order[id].quantity}`);
             }
             updateOrderList();
+            saveOrderState();
         }
         
-    
         function updateOrderList() {
             const list = document.getElementById('order-list');
             const totalEl = document.getElementById('total-price');
@@ -422,7 +446,6 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
                 return;
             }
             
-          
             confirmBtn.disabled = false;
             confirmBtn.classList.remove('btn-secondary');
          
@@ -434,7 +457,7 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
                 const itemElement = document.createElement('div');
                 itemElement.className = 'order-item';
                 itemElement.innerHTML = `
-                    <img src="/php-cafeteria/public/uploads/${item.image}" class="order-item-img" alt="${item.name}">
+                    <img src="/php-cafeteria/public/uploads/products/${item.image}" class="order-item-img" alt="${item.name}">
                     <div class="order-item-details">
                         <strong>${item.name}</strong>
                         <div class="text-muted small">${item.price} EGP × ${item.quantity}</div>
@@ -453,12 +476,10 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
                 list.appendChild(itemElement);
             }
             
-           
             totalEl.textContent = total.toFixed(2);
             quantitiesInput.value = JSON.stringify(quantities);
         }
         
-      
         function updateQuantity(id, delta) {
             if (order[id]) {
                 order[id].quantity += delta;
@@ -470,6 +491,7 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
                     showToast(`${order[id].name} quantity updated to ${order[id].quantity}`);
                 }
                 updateOrderList();
+                saveOrderState(); 
             }
         }
        
@@ -483,7 +505,12 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
             
             if (this.value) {
                 userInfoDiv.style.display = 'block';
-                userImage.src = '/php-cafeteria/public/uploads/' + selectedOption.getAttribute('data-picture');
+              
+                const picturePath = selectedOption.getAttribute('data-picture');
+                userImage.src = picturePath ? '/php-cafeteria/public/uploads/users/' + picturePath : '/php-cafeteria/public/uploads/default-user.jpg';
+                userImage.onerror = function() {
+                    this.src = '/php-cafeteria/public/uploads/default-user.jpg';
+                };
                 userName.textContent = selectedOption.textContent.split(' (Room')[0];
                 userEmail.textContent = selectedOption.getAttribute('data-email');
                 
@@ -494,8 +521,8 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
             }
             
             updateOrderList();
+            saveOrderState(); 
         });
-        
        
         document.getElementById('search-input').addEventListener('input', performSearch);
 
@@ -532,21 +559,19 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
             }
         }
 
-       
         document.querySelectorAll('.page-link').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('search-input').value = '';
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = link.getAttribute('href');
                 
-                document.querySelectorAll('.product-item').forEach(item => {
-                    item.style.display = 'block';
-                });
+              
+                saveOrderState();
                 
-                const noResultsMessage = document.querySelector('.no-results-message');
-                if (noResultsMessage) noResultsMessage.remove();
+               
+                window.location.href = url;
             });
         });
 
-        
         document.getElementById('order-form').addEventListener('submit', function(e) {
             const userId = document.getElementById('user_id').value;
             
@@ -561,8 +586,13 @@ $users = mysqli_query($myconnection, "SELECT u.id, u.name, u.email, u.picture, r
                         ${!userId ? 'Please select a customer first' : 'Please add at least one item to the order'}
                     </div>
                 `;
+            } else {
+                
+                localStorage.removeItem('currentOrder');
+                localStorage.removeItem('selectedUserId');
             }
         });
     </script>
+    
 </body>
 </html>

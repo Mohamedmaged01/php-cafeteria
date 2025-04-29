@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root"; 
 $password = ""; 
-$dbname = "php_project"; 
+$dbname = "PHP_Project"; 
 
 $conn = mysqli_connect($servername, $username, $password, $dbname);
 
@@ -186,36 +186,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                Coffee Shop Admin
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="list.php">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Users</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Manual Order</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Checks</a>
-                    </li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <span class="user-name">Admin</span>
-                    <img src="https://via.placeholder.com/150" alt="Admin" class="user-avatar">
-                </div>
-            </div>
-        </div>
-    </nav>
+<?php include('../navbar.php');
+ ?>
 
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">

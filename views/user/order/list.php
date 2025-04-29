@@ -3,7 +3,7 @@ session_start();
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-define('DB_NAME', 'php_project');
+define('DB_NAME', 'PHP_Project');
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../../../Authentication/login.php");
@@ -274,36 +274,45 @@ $current_page_orders = array_slice($orders, $offset, $items_per_page);
         font-weight: bold;
         background-color: #f8f9fa;
     }
+    .item-image {
+    width: 80px;       
+    height: 80px;      
+    object-fit: cover; 
+    border-radius: 8px;
+    object-position: center; 
+}
   </style>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom mb-4">
-    <div class="container">
-      <a class="navbar-brand" href="#"><i class="fas fa-mug-hot"></i> Coffee Shop</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="index.php"><i class="fas fa-home"></i> Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="orders.php"><i class="fas fa-list"></i> My Orders</a>
-          </li>
-        </ul>
-        <div class="d-flex align-items-center user-info">
-          <?php if (!empty($user_name)): ?>
-            <span class="user-name"><?= htmlspecialchars($_SESSION['user_name']) ?></span>
-            <span class="user-name"><?= htmlspecialchars($user_name) ?></span>
-          <?php endif; ?>
-          <a href="profile.php" class="d-block">
-            <img src="assets/default-avatar.jpg" alt="User" class="user-avatar">
-          </a>
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-coffee me-2"></i> Café Delight
+            </a>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/php-cafeteria/views/user/order/list.php">
+                            <i class="fas fa-list-alt me-1"></i> My Orders
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- التعديل هنا: جزء عرض بيانات المستخدم -->
+                <div class="d-flex align-items-center">
+                    <span class="user-name">
+                        <?= htmlspecialchars($_SESSION['user_name'] ?? 'Guest') ?>
+                    </span>
+                    <img src="/php-cafeteria/public/uploads/users/<?= htmlspecialchars($_SESSION['user_image'] ?? 'default-user.jpg') ?>" 
+     class="user-avatar" 
+     alt="User Avatar"
+     onerror="this.onerror=null; this.src='/php-cafeteria/public/uploads/default-user.jpg'">
+
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </nav>
+    </nav>
 
   <div class="container mb-5">
     <h1 class="mb-4"><i class="fas fa-clipboard-list me-2"></i>My Orders</h1>
@@ -414,7 +423,11 @@ $current_page_orders = array_slice($orders, $offset, $items_per_page);
                     <tr class="order-item-row">
                       <td class="d-flex align-items-center">
                         <?php if (!empty($item['image'])): ?>
-                          <img src="assets/products/<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" class="product-img">
+                          <img src="/php-cafeteria/public/uploads/products/<?= htmlspecialchars($item['image']) ?>" 
+     class="item-image" 
+     alt="<?= htmlspecialchars($item['name']) ?>"
+     onerror="this.onerror=null; this.src='/php-cafeteria/public/uploads/default-product.png'">
+
                         <?php else: ?>
                           <div class="product-img bg-light d-flex align-items-center justify-content-center">
                             <i class="fas fa-coffee text-muted"></i>
@@ -491,13 +504,7 @@ $current_page_orders = array_slice($orders, $offset, $items_per_page);
     <?php endif; ?>
   </div>
 
-  <footer class="bg-dark text-white py-4 mt-5">
-    <div class="container text-center">
-      <p class="mb-0">&copy; <?= date('Y') ?> Coffee Shop. All rights reserved.</p>
-      <p class="small text-muted">Enjoy the perfect brew every time.</p>
-    </div>
-  </footer>
-
+ 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(item => {

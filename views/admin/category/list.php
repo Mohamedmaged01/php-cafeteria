@@ -3,10 +3,6 @@ include_once '../../../config/db.php';
 session_start();
 
 
-if (($_SESSION['role'] ?? 'customer') !== 'admin') {
-    header("Location: /php-cafeteria/views/user/order/index.php");
-    exit;
-}
 
 $per_page = 6;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -51,9 +47,7 @@ if (!$categories) {
             background-color: var(--light-coffee);
             color: white;
         }
-        body {
-            padding-top: 70px;
-        }
+       
         .card {
             border: none;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
@@ -76,9 +70,20 @@ if (!$categories) {
         .search-box {
             max-width: 300px;
         }
+        .container-fluid{
+             
+            margin-top: 10px; 
+        }
+        
+       
+    
     </style>
 </head>
 <body>
+
+<?php include('../navbar.php');
+ ?>
+
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">

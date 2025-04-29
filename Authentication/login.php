@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 include_once'connect.php';
 
 $error = '';
@@ -8,7 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $myconnection->real_escape_string($_POST['email']);
     $password = $_POST['password'];
 
-    $stmt = $myconnection->prepare("SELECT id, password, role FROM users WHERE email = ?");
+   
+    $stmt = $myconnection->prepare("SELECT id, name, password, role, picture FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -17,10 +19,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (password_verify($password, $user['password'])) {
             $token = bin2hex(random_bytes(32));
             
+           
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_role'] = $user['role'];
+            $_SESSION['user_image'] = $user['picture'];
             
-            $redirect_page = ($user['role'] == 'admin') ? 'dashboard.php' : '../views/user/order/index.php';
+            if ($user['role'] == 'admin') {
+                $redirect_page = '../views/admin/dashboard.php';
+            } elseif ($user['role'] == 'customer') {
+                $redirect_page = '../views/user/order/index.php';
+            } else {
+                $error = 'Unauthorized access role.';
+            }
+            
             
             echo "<script>
                 sessionStorage.setItem('authToken', '".$token."');

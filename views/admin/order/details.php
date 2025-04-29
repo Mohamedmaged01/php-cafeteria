@@ -2,11 +2,6 @@
 include_once '../../../config/db.php';
 session_start();
 
-// Admin login check
-// if (!isset($_SESSION['admin_id'])) {
-//     header("Location: /php-cafeteria/views/admin/login.php");
-//     exit();
-// }
 
 $order_id = intval($_GET['id']);
 $order = mysqli_query($myconnection, "SELECT * FROM orders WHERE id = $order_id");
@@ -141,7 +136,7 @@ $customer_data = mysqli_fetch_assoc($customer);
                             <div class="card-body">
                                 <h5 class="card-title"><i class="fas fa-user info-icon"></i>Customer Information</h5>
                                 <div class="d-flex align-items-center mb-3">
-                                    <img src="/php-cafeteria/public/uploads/<?= $customer_data['picture'] ?>" 
+                                    <img src="/php-cafeteria/public/uploads/users/<?= $customer_data['picture'] ?>" 
                                          class="rounded-circle me-3" 
                                          style="width: 60px; height: 60px; object-fit: cover;">
                                     <div>
@@ -194,9 +189,10 @@ $customer_data = mysqli_fetch_assoc($customer);
                             <?php while($item = mysqli_fetch_assoc($items)): ?>
                                 <tr>
                                     <td>
-                                        <img src="/php-cafeteria/public/uploads/<?= $item['image'] ?>" 
-                                             class="item-image" 
-                                             alt="<?= $item['name'] ?>">
+                                    <img src="/php-cafeteria/public/uploads/products/<?= htmlspecialchars($item['image']) ?>" 
+     class="item-image" 
+     alt="<?= htmlspecialchars($item['name']) ?>"
+     onerror="this.onerror=null; this.src='/php-cafeteria/public/uploads/default-product.png'">
                                     </td>
                                     <td><?= $item['name'] ?></td>
                                     <td class="text-center"><?= $item['quantity'] ?></td>

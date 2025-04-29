@@ -2,10 +2,6 @@
 include_once '../../../config/db.php';
 session_start();
 
-if (($_SESSION['role'] ?? 'customer') !== 'admin') {
-    header("Location: ../../user/order/index.php");
-    exit;
-}
 
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['user_id'] = 1;
@@ -82,6 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
+
+<?php include('../navbar.php');
+ ?>
+<div style="margin-top: 70px;">
     <div class="d-flex">
    
         <div class="main-content">

@@ -2,11 +2,6 @@
 include_once '../../../config/db.php';
 session_start();
 
-// Admin login check
-// if (!isset($_SESSION['admin_id'])) {
-//     header("Location: /php-cafeteria/views/admin/login.php");
-//     exit();
-// }
 
 
 $user_id = (int) ($_POST['user_id'] ?? 0);

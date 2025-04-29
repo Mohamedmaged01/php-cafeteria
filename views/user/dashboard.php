@@ -11,25 +11,25 @@ $per_page = 6;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page > 1) ? ($page * $per_page) - $per_page : 0;
 
-// Get all categories for filter
+
 $categories = mysqli_query($myconnection, "SELECT * FROM categories");
 $category_filter = isset($_GET['category']) ? (int)$_GET['category'] : null;
 
-// Build the base query
+
 $query = "SELECT p.* FROM products p WHERE p.available = 1";
 
-// Add category filter if selected
+
 if ($category_filter && $category_filter > 0) {
     $query .= " AND p.category_id = $category_filter";
 }
 
-// Get total count for pagination
+
 $total_query = str_replace("SELECT p.*", "SELECT COUNT(*) as total", $query);
 $total_result = mysqli_query($myconnection, $total_query);
 $total = mysqli_fetch_assoc($total_result)['total'];
 $pages = ceil($total / $per_page);
 
-// Add pagination to main query
+
 $query .= " LIMIT $start, $per_page";
 $products = mysqli_query($myconnection, $query);
 ?>
@@ -220,7 +220,7 @@ $products = mysqli_query($myconnection, $query);
             color: var(--primary-color);
         }
         
-        /* New styles for category filter */
+       
         .category-filter {
             margin-bottom: 30px;
             background: white;
@@ -340,7 +340,7 @@ $products = mysqli_query($myconnection, $query);
                 <?php while($product = mysqli_fetch_assoc($products)): ?>
                     <div class="col-lg-4 col-md-6">
                     <div class="product-card" onclick="window.location='../../views/user/auth/login.php?redirect=product&id=<?= $product['id'] ?>'">
-                            <img src="/php-cafeteria/public/uploads/<?= $product['image'] ?>" 
+                    <img src="/php-cafeteria/public/uploads/products/<?= $product['image'] ?>" 
                                  class="product-img w-100" 
                                  alt="<?= $product['name'] ?>">
                             <div class="p-3">

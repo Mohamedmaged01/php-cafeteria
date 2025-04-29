@@ -3,7 +3,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once __DIR__ . '/../connect.php';
+include_once '../../../config/db.php';
 require_once __DIR__ . '/auth.php';
 
 // Admin authentication
@@ -20,7 +20,7 @@ if ($_SESSION['user_role'] != 'admin') {
 // Search functionality
 $search = '';
 $users = [];
-$query = "SELECT id, name, email, room, ext, role, picture, created_at FROM users";
+$query = "SELECT id, name, email, ext, role, picture, created_at FROM users";
 
 if (isset($_GET['search']) && !empty($_GET['search'])) {
     $search = trim($myconnection->real_escape_string($_GET['search']));
@@ -44,7 +44,6 @@ if ($result) {
     <title>User Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     <style>
         .search-container {
             margin-bottom: 20px;
@@ -54,20 +53,21 @@ if ($result) {
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
+            border: 1px solid #dee2e6;
+        }
+        .btn-coffee {
+            background-color: #6F4E37;
+            color: white;
+        }
+        .btn-coffee:hover {
+            background-color: #5a3c2a;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="../../dashboard.php">Cafeteria Admin</a>
-            <div class="ms-auto d-flex align-items-center">
-                <span class="navbar-text me-3">Welcome, <?= htmlspecialchars($_SESSION['name'] ?? 'Admin') ?></span>
-                <a href="../../logout.php" class="btn btn-outline-light">Logout</a>
-            </div>
-        </div>
-    </nav>
-
+<?php include('../navbar.php');
+ ?>
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="text-center">User Management</h2>
@@ -114,7 +114,6 @@ if ($result) {
                         <th>Photo</th>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Room</th>
                         <th>Ext</th>
                         <th>Role</th>
                         <th>Registered</th>
@@ -124,19 +123,27 @@ if ($result) {
                 <tbody>
                     <?php if (empty($users)): ?>
                         <tr>
-                            <td colspan="9" class="text-center">No users found</td>
+                            <td colspan="8" class="text-center">No users found</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($users as $user): ?>
                         <tr>
                             <td><?= $user['id'] ?></td>
                             <td>
-                                <img src="<?= !empty($user['picture']) ? '../../uploads/'.$user['picture'] : '../../assets/images/default-user.png' ?>" 
-                                     class="profile-img" alt="User Photo">
+                                <?php
+                                $imagePath = '/php-cafeteria/public/uploads/users/' . ($user['picture'] ?? '');
+                                $defaultImage = '/php-cafeteria/public/assets/images/default-user.png';
+                                ?>
+                                <img src="<?= (!empty($user['picture']) && file_exists($_SERVER['DOCUMENT_ROOT'] . $imagePath) 
+    ? $imagePath 
+    : $defaultImage ) ?>" 
+    class="profile-img" 
+    alt="User Photo"
+    onerror="this.src='<?= $defaultImage ?>'">
+
                             </td>
                             <td><?= htmlspecialchars($user['name']) ?></td>
                             <td><?= htmlspecialchars($user['email']) ?></td>
-                            <td><?= htmlspecialchars($user['room'] ?? '-') ?></td>
                             <td><?= htmlspecialchars($user['ext'] ?? '-') ?></td>
                             <td>
                                 <span class="badge bg-<?= $user['role'] == 'admin' ? 'dark' : 'secondary' ?>">

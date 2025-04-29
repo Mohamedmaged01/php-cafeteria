@@ -2,10 +2,7 @@
 include_once '../../../config/db.php';
 session_start();
 
-if (($_SESSION['role'] ?? 'customer') !== 'admin') {
-    header("Location: /php-cafeteria/views/user/order/index.php");
-    exit;
-}
+
 
 $category_id = intval($_GET['id'] ?? 0);
 

@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $confirm_password = $_POST['confirm_password'];
    
     $ext = $myconnection->real_escape_string(substr($_POST['ext'], 0, 10)); 
-
     $picture = 'download.jpeg'; 
     if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == UPLOAD_ERR_OK) {
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
@@ -37,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $target_path = $upload_dir . $filename;
                 
                 if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $target_path)) {
-                    $picture = $target_path;
+                    $picture = $filename; 
                     chmod($target_path, 0644);
                 } else {
                     $errors[] = 'Failed to upload profile picture. Please try again.';
@@ -47,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $errors[] = 'Only JPG, PNG, and GIF files are allowed';
         }
     }
-
+    
     if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
         $errors[] = 'All required fields must be filled';
     }

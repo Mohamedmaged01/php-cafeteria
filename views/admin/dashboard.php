@@ -1,13 +1,11 @@
 <?php
 session_start();
-include_once"./connect.php"; 
-require_once __DIR__ . './allusers/auth.php';
+include_once __DIR__ . '/../../config/db.php'; 
+require_once __DIR__ . '/allusers/auth.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-
-checkAdminAuth();
 ?>
 
 <!DOCTYPE html>
@@ -20,9 +18,9 @@ checkAdminAuth();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #6F4E37; /* Coffee brown */
-            --secondary-color: #5a3c2a; /* Darker coffee */
-            --accent-color: #C4A484; /* Light coffee */
+            --primary-color: #6F4E37; 
+            --secondary-color: #5a3c2a; 
+            --accent-color: #C4A484; 
             --light-color: #f8f9fa;
             --dark-color: #212529;
         }
@@ -73,7 +71,7 @@ checkAdminAuth();
         }
         
         .main-content {
-            margin-left: 250px;
+            
             padding: 2rem;
         }
         
@@ -139,36 +137,28 @@ checkAdminAuth();
         .page-link {
             color: var(--primary-color);
         }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .dashboard-card {
+                margin-bottom: 15px;
+            }
+        }
     </style>
 </head>
 <body>
+
+<?php include('navbar.php');
+ ?>
+
     <div class="d-flex">
-        <!-- Sidebar -->
-        <div class="sidebar" style="width: 250px;">
-            <div class="sidebar-brand">
-                <h3><i class="fas fa-coffee me-2"></i> Cafe Admin</h3>
-            </div>
-            <ul class="sidebar-nav">
-                <li class="active">
-                    <a href="dashboard.php"><i class="fas fa-home me-2"></i> Dashboard</a>
-                </li>
-                <li>
-                    <a href="./allusers/list.php"><i class="fas fa-users me-2"></i> Users</a>
-                </li>
-                <li>
-                    <a href="./category/list.php"><i class="fas fa-tags me-2"></i> Categories</a>
-                </li>
-                <li>
-                    <a href="./product/list.php"><i class="fas fa-mug-hot me-2"></i> Products</a>
-                </li>
-                <li>
-                    <a href="./order/list.php"><i class="fas fa-receipt me-2"></i> Orders</a>
-                </li>
-                <li>
-                    <a href="../../Authentication/logout.php"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
-                </li>
-            </ul>
-        </div>
 
         <!-- Main Content -->
         <div class="main-content" style="flex: 1;">
@@ -176,18 +166,13 @@ checkAdminAuth();
             <nav class="navbar navbar-expand-lg mb-4 rounded">
                 <div class="container-fluid">
                     <h4 class="mb-0">Admin Dashboard</h4>
-                    <div class="d-flex align-items-center">
-                        <span class="me-3">Welcome, <?= htmlspecialchars($_SESSION['name'] ?? 'Admin') ?></span>
-                        <img src="../../uploads/profile_pics/<?= $_SESSION['picture'] ?? 'download.jpeg' ?>" 
-                             class="profile-img" 
-                             onerror="this.src='../uploads/profile_pics/680cab30bbf82.jpeg';">
-                    </div>
+                   
                 </div>
             </nav>
-
+<div class="container">
             <!-- Dashboard Cards -->
             <div class="row mb-4">
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6">
                     <div class="card dashboard-card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
@@ -200,16 +185,15 @@ checkAdminAuth();
                                         ?>
                                     </h3>
                                 </div>
-                                <div class="bg-accent p-3 rounded d-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
-                                 <img src="./photo.png" alt="Users" style="width: 80px; height: 80px; object-fit: contain;">
-                                 </div>
-
+                                <div class="bg-accent p-3 rounded">
+                                    <i class="fas fa-users fa-2x text-coffee"></i>
+                                </div>
                             </div>
-                            <a href="../Authentication/allusers/list.php" class="btn btn-sm btn-coffee mt-2">View Users</a>
+                            <a href="./allusers/list.php" class="btn btn-sm btn-coffee mt-2">View Users</a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6">
                     <div class="card dashboard-card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
@@ -223,14 +207,14 @@ checkAdminAuth();
                                     </h3>
                                 </div>
                                 <div class="bg-accent p-3 rounded">
-                                    <i class="fas fa-mug-hot fa-2x text-primary"></i>
+                                    <i class="fas fa-mug-hot fa-2x text-coffee"></i>
                                 </div>
                             </div>
-                            <a href="../products/list.php" class="btn btn-sm btn-coffee mt-2">View Products</a>
+                            <a href="./product/list.php" class="btn btn-sm btn-coffee mt-2">View Products</a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6">
                     <div class="card dashboard-card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
@@ -244,34 +228,14 @@ checkAdminAuth();
                                     </h3>
                                 </div>
                                 <div class="bg-accent p-3 rounded">
-                                    <i class="fas fa-receipt fa-2x text-primary"></i>
+                                    <i class="fas fa-receipt fa-2x text-coffee"></i>
                                 </div>
                             </div>
-                            <a href="../orders/list.php" class="btn btn-sm btn-coffee mt-2">View Orders</a>
+                            <a href="./checks/check.php" class="btn btn-sm btn-coffee mt-2">View Orders</a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card dashboard-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-muted mb-2">Today's Orders</h6>
-                                    <h3>
-                                        <?php 
-                                        $result = $myconnection->query("SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURDATE()");
-                                        echo $result->fetch_row()[0];
-                                        ?>
-                                    </h3>
-                                </div>
-                                <div class="bg-accent p-3 rounded">
-                                    <i class="fas fa-calendar-day fa-2x text-primary"></i>
-                                </div>
-                            </div>
-                            <a href="../orders/list.php?filter=today" class="btn btn-sm btn-coffee mt-2">View Today</a>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
 
             <!-- Recent Orders -->
@@ -319,7 +283,7 @@ checkAdminAuth();
                                     </td>
                                     <td><?= date('M d, Y h:i A', strtotime($order['created_at'])) ?></td>
                                     <td>
-                                        <a href="../orders/view.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-coffee">
+                                        <a href="./order/details.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-coffee">
                                             <i class="fas fa-eye"></i> View
                                         </a>
                                     </td>
@@ -334,119 +298,62 @@ checkAdminAuth();
                         </table>
                     </div>
                     <div class="text-end mt-3">
-                        <a href="../orders/list.php" class="btn btn-coffee">View All Orders</a>
+                        <a href="./checks/check.php" class="btn btn-coffee">View All Orders</a>
                     </div>
                 </div>
             </div>
 
             <!-- Recent Users -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i> Recent Users</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Role</th>
-                                            <th>Joined</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $query = "SELECT name, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 5";
-                                        $result = $myconnection->query($query);
-                                        
-                                        if ($result->num_rows > 0) {
-                                            while ($user = $result->fetch_assoc()) {
-                                        ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($user['name']) ?></td>
-                                            <td><?= htmlspecialchars($user['email']) ?></td>
-                                            <td>
-                                                <span class="badge <?= $user['role'] == 'admin' ? 'bg-dark' : 'bg-secondary' ?>">
-                                                    <?= ucfirst($user['role']) ?>
-                                                </span>
-                                            </td>
-                                            <td><?= date('M d, Y', strtotime($user['created_at'])) ?></td>
-                                        </tr>
-                                        <?php
-                                            }
-                                        } else {
-                                            echo '<tr><td colspan="4" class="text-center">No users found</td></tr>';
-                                        }
-                                        ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="text-end mt-3">
-                                <a href="./allusers/list.php" class="btn btn-coffee">View All Users</a>
-                            </div>
-                        </div>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i> Recent Users</h5>
                 </div>
-
-                <!-- Low Stock Products -->
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> Low Stock Products</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Product</th>
-                                            <th>Category</th>
-                                            <th>Price</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $query = "SELECT p.name, p.price, p.available, c.name as category 
-                                                  FROM products p 
-                                                  JOIN categories c ON p.category_id = c.id 
-                                                  WHERE p.available = FALSE 
-                                                  ORDER BY p.name LIMIT 5";
-                                        $result = $myconnection->query($query);
-                                        
-                                        if ($result->num_rows > 0) {
-                                            while ($product = $result->fetch_assoc()) {
-                                        ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($product['name']) ?></td>
-                                            <td><?= htmlspecialchars($product['category']) ?></td>
-                                            <td>$<?= number_format($product['price'], 2) ?></td>
-                                            <td>
-                                                <span class="badge bg-danger">Out of Stock</span>
-                                            </td>
-                                        </tr>
-                                        <?php
-                                            }
-                                        } else {
-                                            echo '<tr><td colspan="4" class="text-center">All products are in stock</td></tr>';
-                                        }
-                                        ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="text-end mt-3">
-                                <a href="../products/list.php" class="btn btn-coffee">View All Products</a>
-                            </div>
-                        </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $query = "SELECT name, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 5";
+                                $result = $myconnection->query($query);
+                                
+                                if ($result->num_rows > 0) {
+                                    while ($user = $result->fetch_assoc()) {
+                                ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($user['name']) ?></td>
+                                    <td><?= htmlspecialchars($user['email']) ?></td>
+                                    <td>
+                                        <span class="badge <?= $user['role'] == 'admin' ? 'bg-dark' : 'bg-secondary' ?>">
+                                            <?= ucfirst($user['role']) ?>
+                                        </span>
+                                    </td>
+                                    <td><?= date('M d, Y', strtotime($user['created_at'])) ?></td>
+                                </tr>
+                                <?php
+                                    }
+                                } else {
+                                    echo '<tr><td colspan="4" class="text-center">No users found</td></tr>';
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end mt-3">
+                        <a href="./allusers/list.php" class="btn btn-coffee">View All Users</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    <div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Simple animation for dashboard cards

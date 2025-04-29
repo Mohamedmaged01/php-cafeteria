@@ -10,7 +10,7 @@ $order = mysqli_query($myconnection, "SELECT * FROM orders WHERE id = $order_id"
 $order_data = mysqli_fetch_assoc($order);
 
 $items = mysqli_query($myconnection, "
-    SELECT p.name, op.quantity, op.price
+    SELECT p.name, op.quantity, op.price, p.image
     FROM order_products op
     JOIN products p ON p.id = op.product_id
     WHERE op.order_id = $order_id
@@ -89,6 +89,13 @@ $items = mysqli_query($myconnection, "
             width: 20px;
             text-align: center;
         }
+        .item-image {
+    width: 80px;       
+    height: 80px;      
+    object-fit: cover; 
+    border-radius: 8px;
+    object-position: center; 
+}
     </style>
 </head>
 <body>
@@ -158,9 +165,10 @@ $items = mysqli_query($myconnection, "
                             <?php while($item = mysqli_fetch_assoc($items)): ?>
                                 <tr>
                                     <td>
-                                        <img src="/php-cafeteria/public/uploads/<?= strtolower(str_replace(' ', '-', $item['name'])) ?>.png" 
-                                             class="item-image" 
-                                             alt="<?= $item['name'] ?>">
+                                    <img src="/php-cafeteria/public/uploads/products/<?= htmlspecialchars($item['image']) ?>" 
+     class="item-image" 
+     alt="<?= htmlspecialchars($item['name']) ?>"
+     onerror="this.onerror=null; this.src='/php-cafeteria/public/uploads/default-product.png'">
                                     </td>
                                     <td><?= $item['name'] ?></td>
                                     <td class="text-center"><?= $item['quantity'] ?></td>

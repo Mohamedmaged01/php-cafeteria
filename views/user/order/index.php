@@ -1,10 +1,13 @@
 <?php
-include_once '../../../config/db.php';
-
 session_start();
-$_SESSION['user_id'] = 1;
-$_SESSION['user_name'] = "Aya";
-$_SESSION['user_image'] = "default-user.jpg"; 
+
+
+if(!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+include_once '../../../config/db.php';
 
 $per_page = 8;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -20,7 +23,6 @@ $products = mysqli_query($myconnection,
 $rooms = mysqli_query($myconnection, "SELECT * FROM rooms WHERE status = 'available'");
 $categories = mysqli_query($myconnection, "SELECT * FROM categories");
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -190,16 +192,20 @@ $categories = mysqli_query($myconnection, "SELECT * FROM categories");
                     </li>
                 </ul>
                 
+                <!-- التعديل هنا: جزء عرض بيانات المستخدم -->
                 <div class="d-flex align-items-center">
-                    <span class="text-white me-2"><?= $_SESSION['user_name'] ?></span>
-                    <img src="/php-cafeteria/public/uploads/<?= $_SESSION['user_image'] ?>" 
-                         class="user-avatar" 
-                         alt="User Avatar">
+                    <span class="user-name">
+                        <?= htmlspecialchars($_SESSION['user_name'] ?? 'Guest') ?>
+                    </span>
+                    <img src="/php-cafeteria/public/uploads/users/<?= htmlspecialchars($_SESSION['user_image'] ?? 'default-user.jpg') ?>" 
+     class="user-avatar" 
+     alt="User Avatar"
+     onerror="this.onerror=null; this.src='/php-cafeteria/public/uploads/default-user.jpg'">
+
                 </div>
             </div>
         </div>
     </nav>
-
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-8 p-4">
@@ -254,7 +260,7 @@ $categories = mysqli_query($myconnection, "SELECT * FROM categories");
                         <div class="col-xl-3 col-lg-4 col-md-6 mb-4 product-item" data-category="<?= $product['category_id'] ?>">
                             <div class="card product-card h-100" 
                                  onclick="addToOrder(<?= $product['id'] ?>, '<?= htmlspecialchars($product['name'], ENT_QUOTES) ?>', <?= $product['price'] ?>, '<?= $product['image'] ?>')">
-                                <img src="/php-cafeteria/public/uploads/<?= $product['image'] ?>" 
+                                <img src="/php-cafeteria/public/uploads/products/<?= $product['image'] ?>" 
                                      class="card-img-top" 
                                      style="height: 180px; object-fit: cover;" 
                                      alt="<?= htmlspecialchars($product['name'], ENT_QUOTES) ?>">
@@ -341,6 +347,23 @@ $categories = mysqli_query($myconnection, "SELECT * FROM categories");
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+       
+        function saveOrderState() {
+            localStorage.setItem('currentOrder', JSON.stringify(order));
+        }
+
+       
+        function loadOrderState() {
+            const savedOrder = localStorage.getItem('currentOrder');
+            if (savedOrder) {
+                order = JSON.parse(savedOrder);
+                updateOrderList();
+            }
+        }
+
+     
+        document.addEventListener('DOMContentLoaded', loadOrderState);
+
         let order = {};
         
         function addToOrder(id, name, price, image) {
@@ -350,6 +373,7 @@ $categories = mysqli_query($myconnection, "SELECT * FROM categories");
                 order[id].quantity += 1;
             }
             updateOrderList();
+            saveOrderState();
         }
         
         function updateOrderList() {
@@ -384,8 +408,8 @@ $categories = mysqli_query($myconnection, "SELECT * FROM categories");
                 const itemElement = document.createElement('div');
                 itemElement.className = 'order-item';
                 itemElement.innerHTML = `
-                    <img src="/php-cafeteria/public/uploads/${item.image}" class="order-item-img" alt="${item.name}">
-                    <div style="flex: 1;">
+                   <img src="/php-cafeteria/public/uploads/products/${item.image}" class="order-item-img" alt="${item.name}">
+                   <div style="flex: 1;">
                         <strong>${item.name}</strong>
                         <div class="text-muted small">${item.price} LE × ${item.quantity}</div>
                     </div>
@@ -414,6 +438,7 @@ $categories = mysqli_query($myconnection, "SELECT * FROM categories");
                     delete order[id];
                 }
                 updateOrderList();
+                saveOrderState();
             }
         }
         
@@ -467,14 +492,11 @@ $categories = mysqli_query($myconnection, "SELECT * FROM categories");
                 }
             });
             
-            // Reset search input when filtering
             document.getElementById('search-input').value = '';
             
-            // Remove any no-results message if present
             const noResultsMessage = document.querySelector('.no-results-message');
             if (noResultsMessage) noResultsMessage.remove();
             
-            // Highlight the active filter button
             document.querySelectorAll('.btn-outline-coffee').forEach(btn => {
                 btn.classList.remove('active', 'btn-coffee');
                 btn.classList.add('btn-outline-coffee');
@@ -491,15 +513,11 @@ $categories = mysqli_query($myconnection, "SELECT * FROM categories");
         }
 
         document.querySelectorAll('.page-link').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('search-input').value = '';
-                
-                document.querySelectorAll('.product-item').forEach(item => {
-                    item.style.display = 'block';
-                });
-                
-                const noResultsMessage = document.querySelector('.no-results-message');
-                if (noResultsMessage) noResultsMessage.remove();
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = link.getAttribute('href');
+                saveOrderState();
+                window.location.href = url;
             });
         });
 
@@ -520,34 +538,15 @@ $categories = mysqli_query($myconnection, "SELECT * FROM categories");
                 setTimeout(() => {
                     document.querySelector('.order-section').classList.remove('animate__animated', 'animate__headShake');
                 }, 1000);
+            } else {
+                localStorage.removeItem('currentOrder');
             }
         });
 
-        function filterProducts(categoryId) {
-    const allItems = document.querySelectorAll('.product-item');
-    
-    allItems.forEach(item => {
-        if (categoryId === 'all') {
-            item.style.display = 'block';
-        } else {
-            if (item.dataset.category == categoryId) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
-        }
-    });
-    
-    // Reset search input when filtering
-    document.getElementById('search-input').value = '';
-    
-    // Remove any no-results message if present
-    const noResultsMessage = document.querySelector('.no-results-message');
-    if (noResultsMessage) noResultsMessage.remove();
-    
-    // Update the dropdown to show selected option
-    document.getElementById('category-filter').value = categoryId;
-}
+       
+        document.getElementById('category-filter').addEventListener('change', function() {
+            filterProducts(this.value);
+        });
     </script>
 </body>
 </html>
