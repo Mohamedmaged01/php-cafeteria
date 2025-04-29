@@ -339,7 +339,8 @@ $products = mysqli_query($myconnection, $query);
             <div class="row g-4">
                 <?php while($product = mysqli_fetch_assoc($products)): ?>
                     <div class="col-lg-4 col-md-6">
-                    <div class="product-card" onclick="window.location='../../views/user/auth/login.php?redirect=product&id=<?= $product['id'] ?>'">
+                    <div class="product-card" onclick="window.location='<?php echo "../../Authentication/login.php"; ?>'">
+
                     <img src="/php-cafeteria/public/uploads/products/<?= $product['image'] ?>" 
                                  class="product-img w-100" 
                                  alt="<?= $product['name'] ?>">
