@@ -170,7 +170,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_product'])) {
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="list_products.php" class="btn btn-secondary">Cancel</a>
+                    <a href="list.php" class="btn btn-secondary">Cancel</a>
                         <button type="submit" name="update_product" class="btn btn-coffee">Update Product</button>
                     </div>
                 </form>

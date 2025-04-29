@@ -10,7 +10,9 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-
+session_start();
+$user_image = $_SESSION['user_image'] ?? 'default.png';
+$username = $_SESSION['user_name'] ?? 'Admin';
 
 $name = '';
 $price = '';
