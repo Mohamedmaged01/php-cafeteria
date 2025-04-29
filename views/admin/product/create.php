@@ -10,11 +10,14 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
+
+
 $name = '';
 $price = '';
 $category_id = '';
 $available = 1;
 $error = '';
+
 
 $categories = [];
 $categorySql = "SELECT id, name FROM categories ORDER BY name ASC";

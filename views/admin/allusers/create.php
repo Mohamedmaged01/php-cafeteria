@@ -10,18 +10,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $myconnection->real_escape_string($_POST['name']);
     $email = $myconnection->real_escape_string($_POST['email']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $room = $myconnection->real_escape_string($_POST['room']);
     $extension = $myconnection->real_escape_string($_POST['ext']);
+    $role = $myconnection->real_escape_string($_POST['role']); // تمت إضافة هذا السطر
 
-    // Validate role
-    $allowed_roles = ['user', 'admin'];
-    $role = 'user';
-    if (isset($_POST['role']) && in_array(strtolower($_POST['role']), $allowed_roles)) {
-        $role = strtolower($_POST['role']);
+    if (empty($name) || empty($email) || empty($_POST['password']) || empty($extension) || empty($role)) {
+        $_SESSION['error'] = "Name, Email, Password, Extension and Role are required";
+        header("Location: create.php");
+        exit();
     }
 
     // Handle image upload
-    $picture = null;
+    $picture = NULL;
     if ($_FILES['picture']['error'] == UPLOAD_ERR_OK) {
         $uploadBase = '../../../public/uploads/users/';
         $uploadDir = $uploadBase . 'profile_pics/';
@@ -62,12 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     try {
-        $stmt = $myconnection->prepare("INSERT INTO users (name, email, password, room, ext, role, picture) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $myconnection->prepare("INSERT INTO users (name, email, password, ext, role, picture) VALUES (?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
             throw new Exception("Statement preparation failed: " . $myconnection->error);
         }
 
-        $stmt->bind_param("sssssss", $name, $email, $password, $room, $extension, $role, $picture);
+        $stmt->bind_param("ssssss", $name, $email, $password, $extension, $role, $picture);
 
         if (!$stmt->execute()) {
             throw new Exception("Statement execution failed: " . $stmt->error);
@@ -78,14 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     } catch (Exception $e) {
         error_log("Database error: " . $e->getMessage());
-        $_SESSION['error'] = "A database error occurred";
+        $_SESSION['error'] = "A database error occurred: " . $e->getMessage();
         header("Location: create.php");
         exit();
     }
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -108,7 +105,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </nav>
 
-
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -125,31 +121,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <form method="POST" enctype="multipart/form-data">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Full Name</label>
+                                    <label class="form-label">Full Name*</label>
                                     <input type="text" class="form-control" name="name" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Email</label>
+                                    <label class="form-label">Email*</label>
                                     <input type="email" class="form-control" name="email" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Password</label>
+                                    <label class="form-label">Password*</label>
                                     <input type="password" class="form-control" name="password" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Role</label>
+                                    <label class="form-label">Role*</label>
                                     <select class="form-select" name="role" required>
-                                        <option value="user">User</option>
+                                        <option value="customer">Customer</option>
                                         <option value="admin">Admin</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Room Number</label>
-                                    <input type="text" class="form-control" name="room">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Extension</label>
-                                    <input type="text" class="form-control" name="ext">
+                                    <label class="form-label">Extension*</label>
+                                    <input type="text" class="form-control" name="ext" required>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label">Profile Picture</label>
@@ -162,6 +154,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <a href="list.php" class="btn btn-coffee">
                                         <i class="fas fa-arrow-left me-1"></i> Back to List
                                     </a>
+                                </div>
+                                <div class="col-12">
+                                    <small class="text-muted">Fields marked with * are required</small>
                                 </div>
                             </div>
                         </form>
